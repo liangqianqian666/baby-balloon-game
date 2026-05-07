@@ -48,13 +48,29 @@ class HandCursor {
     const drawHand = (hand) => {
       if (!hand.visible) return;
       ctx.save();
-      ctx.font = '50px serif';
+
+      // 外圈发光光环
+      const gradient = ctx.createRadialGradient(hand.x, hand.y, 5, hand.x, hand.y, 45);
+      gradient.addColorStop(0, 'rgba(255, 255, 100, 0.7)');
+      gradient.addColorStop(0.5, 'rgba(255, 200, 0, 0.3)');
+      gradient.addColorStop(1, 'rgba(255, 200, 0, 0)');
+      ctx.fillStyle = gradient;
+      ctx.beginPath();
+      ctx.arc(hand.x, hand.y, 45, 0, Math.PI * 2);
+      ctx.fill();
+
+      // 中心圆点
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.9)';
+      ctx.beginPath();
+      ctx.arc(hand.x, hand.y, 14, 0, Math.PI * 2);
+      ctx.fill();
+
+      // 星星 emoji
+      ctx.font = '30px serif';
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
-      // 光晕
-      ctx.shadowColor = 'rgba(255, 200, 0, 0.5)';
-      ctx.shadowBlur = 20;
-      ctx.fillText('👋', hand.x, hand.y);
+      ctx.fillText('⭐', hand.x, hand.y);
+
       ctx.restore();
     };
     drawHand(this.leftHand);
