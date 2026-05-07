@@ -73,40 +73,43 @@ const Camera = {
         await this.segmenter.send({ image: this.video });
       } catch (e) { /* 静默 */ }
     }
-    // 约 15fps 分割，不需要太快
-    setTimeout(() => this._segLoop(), 66);
+    requestAnimationFrame(() => setTimeout(() => this._segLoop(), 50));
   },
 
   // 将人像合成到目标 canvas 上（带童趣背景）
   drawSegmented(targetCtx, canvasW, canvasH) {
     const video = this.video;
     if (!video || video.readyState < 2) return false;
-    if (!this.segMask) return false;
+    if (!this.segMask || !this.segReady) return false;
 
-    const offCanvas = this._segCanvas;
-    offCanvas.width = canvasW;
-    offCanvas.height = canvasH;
-    const offCtx = this._segCtx;
+    try {
+      const offCanvas = this._segCanvas;
+      offCanvas.width = canvasW;
+      offCanvas.height = canvasH;
+      const offCtx = this._segCtx;
 
-    // 先在离屏 canvas 上画视频帧（镜像）
-    offCtx.save();
-    offCtx.translate(canvasW, 0);
-    offCtx.scale(-1, 1);
-    offCtx.drawImage(video, 0, 0, canvasW, canvasH);
-    offCtx.restore();
+      // 先在离屏 canvas 上画视频帧（镜像）
+      offCtx.save();
+      offCtx.translate(canvasW, 0);
+      offCtx.scale(-1, 1);
+      offCtx.drawImage(video, 0, 0, canvasW, canvasH);
+      offCtx.restore();
 
-    // 用 mask 做遮罩：只保留人像区域
-    offCtx.save();
-    offCtx.globalCompositeOperation = 'destination-in';
-    // mask 也要镜像
-    offCtx.translate(canvasW, 0);
-    offCtx.scale(-1, 1);
-    offCtx.drawImage(this.segMask, 0, 0, canvasW, canvasH);
-    offCtx.restore();
+      // 用 mask 做遮罩：只保留人像区域
+      offCtx.save();
+      offCtx.globalCompositeOperation = 'destination-in';
+      // mask 也要镜像
+      offCtx.translate(canvasW, 0);
+      offCtx.scale(-1, 1);
+      offCtx.drawImage(this.segMask, 0, 0, canvasW, canvasH);
+      offCtx.restore();
 
-    // 将抠出的人像绘制到目标 canvas
-    targetCtx.drawImage(offCanvas, 0, 0);
-    return true;
+      // 将抠出的人像绘制到目标 canvas
+      targetCtx.drawImage(offCanvas, 0, 0);
+      return true;
+    } catch (e) {
+      return false;
+    }
   },
 
   // 检测一帧姿态，返回 keypoints

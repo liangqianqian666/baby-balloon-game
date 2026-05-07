@@ -11,7 +11,12 @@
       "Bash(node -c /Users/dev-0401/projects/baby-balloon-game/js/main.js)",
       "Bash(lsof -ti:8888)",
       "Bash(node -c /Users/dev-0401/projects/baby-balloon-game/js/camera.js)",
-      "Bash(node -c /Users/dev-0401/projects/baby-balloon-game/js/game.js)"
+      "Bash(node -c /Users/dev-0401/projects/baby-balloon-game/js/game.js)",
+      "Bash(gh repo:*)",
+      "Bash(gh api:*)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(git push:*)"
     ]
   }
 }
