@@ -112,60 +112,77 @@ const LearningTracker = {
   }
 };
 
-// 页面加载直接启动
+// 页面加载 → 显示关卡选择
 window.addEventListener('DOMContentLoaded', () => {
-  autoStart();
-});
-
-async function autoStart() {
-  document.getElementById('start-screen').style.display = 'none';
-  document.getElementById('level-screen').style.display = 'none';
-  document.getElementById('score-display').style.display = 'block';
-
   AudioManager.init();
   LearningTracker.init();
+  showLevelSelect();
+});
+
+function showLevelSelect() {
+  document.getElementById('level-screen').style.display = 'flex';
+  document.getElementById('game-canvas').style.display = 'none';
+  document.getElementById('score-display').style.display = 'none';
+  document.getElementById('color-hint').style.display = 'none';
+
+  const container = document.getElementById('level-buttons');
+  container.innerHTML = '';
+
+  Object.keys(LEVELS).forEach(key => {
+    const level = LEVELS[key];
+    const btn = document.createElement('button');
+    btn.className = 'level-btn';
+    btn.innerHTML = `<span class="level-icon">${level.icon}</span><span class="level-name">${level.name}</span>`;
+    btn.onclick = () => startGame(key);
+    container.appendChild(btn);
+  });
+}
+
+async function startGame(levelKey) {
+  document.getElementById('level-screen').style.display = 'none';
+  document.getElementById('game-canvas').style.display = 'block';
+  document.getElementById('score-display').style.display = 'block';
 
   const canvas = document.getElementById('game-canvas');
   canvas.width = window.innerWidth;
   canvas.height = window.innerHeight;
 
-  game = new Game(canvas);
+  if (!game) {
+    game = new Game(canvas);
 
-  // 初始化摄像头
-  try {
-    await Camera.init();
-    cameraAvailable = true;
-  } catch (e) {
-    console.warn('Camera not available:', e.message);
-    canvas.addEventListener('mousemove', (e) => {
-      game.handCursor.leftHand.x = e.clientX;
-      game.handCursor.leftHand.y = e.clientY;
-      game.handCursor.leftHand.visible = true;
-    });
-    canvas.addEventListener('touchmove', (ev) => {
-      ev.preventDefault();
-      const t = ev.touches[0];
-      game.handCursor.leftHand.x = t.clientX;
-      game.handCursor.leftHand.y = t.clientY;
-      game.handCursor.leftHand.visible = true;
-    });
-  }
+    // 初始化摄像头
+    try {
+      await Camera.init();
+      cameraAvailable = true;
+    } catch (e) {
+      console.warn('Camera not available:', e.message);
+      canvas.addEventListener('mousemove', (e) => {
+        game.handCursor.leftHand.x = e.clientX;
+        game.handCursor.leftHand.y = e.clientY;
+        game.handCursor.leftHand.visible = true;
+      });
+      canvas.addEventListener('touchmove', (ev) => {
+        ev.preventDefault();
+        const t = ev.touches[0];
+        game.handCursor.leftHand.x = t.clientX;
+        game.handCursor.leftHand.y = t.clientY;
+        game.handCursor.leftHand.visible = true;
+      });
+    }
 
-  // 智能选关卡并开始
-  const levelKey = LearningTracker.pickNextLevel();
-  game.setLevel(levelKey);
-
-  // 主循环
-  function loop() {
-    game.update();
-    game.draw();
+    // 主循环
+    function loop() {
+      game.update();
+      game.draw();
+      requestAnimationFrame(loop);
+    }
     requestAnimationFrame(loop);
   }
-  requestAnimationFrame(loop);
+
+  game.setLevel(levelKey);
 }
 
-// 通关后自动选下一关
+// 通关后回到关卡选择
 function startNextLevel() {
-  const levelKey = LearningTracker.pickNextLevel();
-  game.setLevel(levelKey);
+  showLevelSelect();
 }
