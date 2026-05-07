@@ -48,6 +48,7 @@ const LEVELS = {
     wrongSay: (item, target) => `That's ${item.id}. Find ${target.id}!`,
   },
 
+  /* === 以下关卡暂时隐藏 ===
   shapes: {
     name: 'Shapes',
     icon: '🔷',
@@ -155,4 +156,5 @@ const LEVELS = {
     correctSay: (item) => item.id,
     wrongSay: (item, target) => `That's ${item.id}. Find the ${target.id}!`,
   },
+  === 隐藏结束 === */
 };
