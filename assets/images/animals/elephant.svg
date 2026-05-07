@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">
+  <!-- Ears -->
+  <ellipse cx="48" cy="85" rx="28" ry="32" fill="#A8B8C8"/>
+  <ellipse cx="152" cy="85" rx="28" ry="32" fill="#A8B8C8"/>
+  <ellipse cx="50" cy="85" rx="18" ry="22" fill="#C8D8E8"/>
+  <ellipse cx="150" cy="85" rx="18" ry="22" fill="#C8D8E8"/>
+  <!-- Body -->
+  <ellipse cx="100" cy="130" rx="55" ry="48" fill="#B0C0D0"/>
+  <!-- Head -->
+  <circle cx="100" cy="82" r="42" fill="#B0C0D0"/>
+  <!-- Belly -->
+  <ellipse cx="100" cy="138" rx="35" ry="28" fill="#C8D8E8"/>
+  <!-- Eyes -->
+  <ellipse cx="80" cy="75" rx="10" ry="11" fill="white"/>
+  <ellipse cx="120" cy="75" rx="10" ry="11" fill="white"/>
+  <circle cx="82" cy="76" r="6" fill="#3A3A3A"/>
+  <circle cx="122" cy="76" r="6" fill="#3A3A3A"/>
+  <circle cx="84" cy="73" r="2.5" fill="white"/>
+  <circle cx="124" cy="73" r="2.5" fill="white"/>
+  <!-- Trunk -->
+  <path d="M100,90 Q100,110 95,125 Q92,132 88,130 Q85,128 90,122 Q94,115 94,105 Q94,95 96,90" fill="#B0C0D0" stroke="#9AB0C0" stroke-width="1.5"/>
+  <!-- Cheeks -->
+  <circle cx="68" cy="92" r="8" fill="#FFB6C1" opacity="0.45"/>
+  <circle cx="132" cy="92" r="8" fill="#FFB6C1" opacity="0.45"/>
+  <!-- Legs -->
+  <rect x="68" y="160" width="20" height="22" rx="10" fill="#B0C0D0" stroke="#9AB0C0" stroke-width="1"/>
+  <rect x="112" y="160" width="20" height="22" rx="10" fill="#B0C0D0" stroke="#9AB0C0" stroke-width="1"/>
+  <!-- Toenails -->
+  <circle cx="73" cy="180" r="2" fill="#C8D8E8"/>
+  <circle cx="78" cy="181" r="2" fill="#C8D8E8"/>
+  <circle cx="83" cy="180" r="2" fill="#C8D8E8"/>
+  <circle cx="117" cy="180" r="2" fill="#C8D8E8"/>
+  <circle cx="122" cy="181" r="2" fill="#C8D8E8"/>
+  <circle cx="127" cy="180" r="2" fill="#C8D8E8"/>
+</svg>

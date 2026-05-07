@@ -1,0 +1,39 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200">
+  <!-- 圆润可爱的卡通兔子 - 幼儿绘本风格 -->
+  <!-- 身体 -->
+  <ellipse cx="100" cy="145" rx="50" ry="42" fill="white" stroke="#DDBBCC" stroke-width="3"/>
+  <!-- 头 -->
+  <circle cx="100" cy="90" r="42" fill="white" stroke="#DDBBCC" stroke-width="3"/>
+  <!-- 左耳 -->
+  <ellipse cx="75" cy="30" rx="14" ry="38" fill="white" stroke="#DDBBCC" stroke-width="3"/>
+  <ellipse cx="75" cy="30" rx="8" ry="28" fill="#FFB0C0" opacity="0.6"/>
+  <!-- 右耳 -->
+  <ellipse cx="125" cy="30" rx="14" ry="38" fill="white" stroke="#DDBBCC" stroke-width="3"/>
+  <ellipse cx="125" cy="30" rx="8" ry="28" fill="#FFB0C0" opacity="0.6"/>
+  <!-- 眼睛 -->
+  <ellipse cx="82" cy="85" rx="9" ry="10" fill="#333"/>
+  <ellipse cx="118" cy="85" rx="9" ry="10" fill="#333"/>
+  <!-- 眼睛高光 -->
+  <circle cx="85" cy="82" r="3" fill="white"/>
+  <circle cx="121" cy="82" r="3" fill="white"/>
+  <!-- 鼻子 -->
+  <ellipse cx="100" cy="98" rx="5" ry="4" fill="#FFB0C0"/>
+  <!-- 嘴巴 -->
+  <path d="M93,102 Q100,110 107,102" fill="none" stroke="#DDBBCC" stroke-width="2" stroke-linecap="round"/>
+  <!-- 门牙 -->
+  <rect x="95" y="102" width="4.5" height="6" rx="1.5" fill="white" stroke="#DDBBCC" stroke-width="1"/>
+  <rect x="100.5" y="102" width="4.5" height="6" rx="1.5" fill="white" stroke="#DDBBCC" stroke-width="1"/>
+  <!-- 胡须 -->
+  <line x1="60" y1="93" x2="78" y2="96" stroke="#DDBBCC" stroke-width="1.5" stroke-linecap="round"/>
+  <line x1="58" y1="100" x2="77" y2="100" stroke="#DDBBCC" stroke-width="1.5" stroke-linecap="round"/>
+  <line x1="122" y1="96" x2="140" y2="93" stroke="#DDBBCC" stroke-width="1.5" stroke-linecap="round"/>
+  <line x1="123" y1="100" x2="142" y2="100" stroke="#DDBBCC" stroke-width="1.5" stroke-linecap="round"/>
+  <!-- 前爪 -->
+  <ellipse cx="75" cy="172" rx="14" ry="10" fill="white" stroke="#DDBBCC" stroke-width="2"/>
+  <ellipse cx="125" cy="172" rx="14" ry="10" fill="white" stroke="#DDBBCC" stroke-width="2"/>
+  <!-- 腮红 -->
+  <ellipse cx="67" cy="100" rx="9" ry="5" fill="#FFB0C0" opacity="0.4"/>
+  <ellipse cx="133" cy="100" rx="9" ry="5" fill="#FFB0C0" opacity="0.4"/>
+  <!-- 小尾巴 -->
+  <circle cx="148" cy="148" r="10" fill="white" stroke="#DDBBCC" stroke-width="2"/>
+</svg>

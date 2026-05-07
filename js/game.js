@@ -366,26 +366,65 @@ class Game {
     }
   }
 
+  _drawCloud(ctx, x, y, size) {
+    ctx.fillStyle = 'rgba(255, 255, 255, 0.8)';
+    ctx.beginPath();
+    ctx.arc(x, y, size * 0.5, 0, Math.PI * 2);
+    ctx.arc(x + size * 0.4, y - size * 0.2, size * 0.4, 0, Math.PI * 2);
+    ctx.arc(x + size * 0.8, y, size * 0.45, 0, Math.PI * 2);
+    ctx.arc(x + size * 0.35, y + size * 0.15, size * 0.35, 0, Math.PI * 2);
+    ctx.fill();
+  }
+
   draw() {
     const ctx = this.ctx;
-    ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+    const w = this.canvas.width;
+    const h = this.canvas.height;
+    ctx.clearRect(0, 0, w, h);
 
-    // 摄像头全屏背景
+    // === 童趣背景 ===
+    // 天空渐变
+    const skyGrad = ctx.createLinearGradient(0, 0, 0, h * 0.75);
+    skyGrad.addColorStop(0, '#87CEEB');
+    skyGrad.addColorStop(1, '#E0F7FF');
+    ctx.fillStyle = skyGrad;
+    ctx.fillRect(0, 0, w, h);
+
+    // 草地
+    const grassGrad = ctx.createLinearGradient(0, h * 0.75, 0, h);
+    grassGrad.addColorStop(0, '#90D26D');
+    grassGrad.addColorStop(1, '#6BBF4E');
+    ctx.fillStyle = grassGrad;
+    ctx.beginPath();
+    ctx.moveTo(0, h * 0.78);
+    // 轻微波浪草地线
+    for (let x = 0; x <= w; x += w / 8) {
+      ctx.quadraticCurveTo(x + w / 16, h * 0.75 + Math.sin(x * 0.005 + this.time * 0.01) * 8, x + w / 8, h * 0.78);
+    }
+    ctx.lineTo(w, h);
+    ctx.lineTo(0, h);
+    ctx.closePath();
+    ctx.fill();
+
+    // 白云（用时间做缓慢飘动）
+    this._drawCloud(ctx, ((this.time * 0.15) % (w + 200)) - 100, h * 0.12, 60);
+    this._drawCloud(ctx, ((this.time * 0.1 + w * 0.5) % (w + 200)) - 100, h * 0.22, 45);
+    this._drawCloud(ctx, ((this.time * 0.08 + w * 0.25) % (w + 200)) - 100, h * 0.08, 35);
+
+    // === 合成人像（抠图后） ===
     const video = document.getElementById('pose-video');
     if (video.readyState >= 2) {
-      ctx.save();
-      ctx.translate(this.canvas.width, 0);
-      ctx.scale(-1, 1);
-      ctx.drawImage(video, 0, 0, this.canvas.width, this.canvas.height);
-      ctx.restore();
-      ctx.fillStyle = 'rgba(135, 206, 235, 0.2)';
-      ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
-    } else {
-      const bgGrad = ctx.createLinearGradient(0, 0, 0, this.canvas.height);
-      bgGrad.addColorStop(0, '#87CEEB');
-      bgGrad.addColorStop(1, '#E0F0FF');
-      ctx.fillStyle = bgGrad;
-      ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+      const segOk = Camera.drawSegmented(ctx, w, h);
+      if (!segOk) {
+        // 分割模型还没就绪，fallback：画半透明视频
+        ctx.save();
+        ctx.globalAlpha = 0.7;
+        ctx.translate(w, 0);
+        ctx.scale(-1, 1);
+        ctx.drawImage(video, 0, 0, w, h);
+        ctx.restore();
+        ctx.globalAlpha = 1;
+      }
     }
 
     // 气球（支持淡入）

@@ -143,6 +143,9 @@ async function startGame(levelKey) {
   document.getElementById('game-canvas').style.display = 'block';
   document.getElementById('score-display').style.display = 'block';
 
+  // 预加载图片
+  await preloadLevelImages(levelKey);
+
   const canvas = document.getElementById('game-canvas');
   canvas.width = window.innerWidth;
   canvas.height = window.innerHeight;

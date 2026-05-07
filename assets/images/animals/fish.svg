@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">
+  <!-- Tail fin -->
+  <polygon points="155,100 185,75 185,125" fill="#5BB8F5" stroke="#3A9EE0" stroke-width="1.5"/>
+  <!-- Body -->
+  <ellipse cx="95" cy="100" rx="60" ry="42" fill="#6EC6FF"/>
+  <!-- Belly -->
+  <ellipse cx="90" cy="112" rx="40" ry="22" fill="#D4EEFF"/>
+  <!-- Dorsal fin -->
+  <path d="M80,58 Q95,35 110,58" fill="#5BB8F5" stroke="#3A9EE0" stroke-width="1"/>
+  <!-- Pectoral fin -->
+  <ellipse cx="105" cy="115" rx="15" ry="8" fill="#5BB8F5" transform="rotate(20,105,115)"/>
+  <!-- Stripes -->
+  <path d="M85,65 Q82,100 85,135" stroke="#5BB8F5" stroke-width="3" fill="none" opacity="0.6"/>
+  <path d="M105,62 Q102,100 105,138" stroke="#5BB8F5" stroke-width="3" fill="none" opacity="0.6"/>
+  <!-- Eye -->
+  <circle cx="60" cy="92" r="14" fill="white"/>
+  <circle cx="62" cy="93" r="8" fill="#3A3A3A"/>
+  <circle cx="65" cy="89" r="3" fill="white"/>
+  <!-- Mouth -->
+  <path d="M38,105 Q42,112 48,108" stroke="#3A3A3A" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+  <!-- Cheek -->
+  <circle cx="52" cy="108" r="7" fill="#FFB6C1" opacity="0.5"/>
+  <!-- Bubbles -->
+  <circle cx="30" cy="75" r="4" fill="none" stroke="#A0D8FF" stroke-width="1.2"/>
+  <circle cx="22" cy="62" r="3" fill="none" stroke="#A0D8FF" stroke-width="1"/>
+  <circle cx="35" cy="55" r="2.5" fill="none" stroke="#A0D8FF" stroke-width="1"/>
+</svg>

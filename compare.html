@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>图片风格对比</title>
+<style>
+  body { font-family: Arial, sans-serif; background: #f0f8ff; padding: 40px; text-align: center; }
+  h1 { color: #555; }
+  .row { display: flex; justify-content: center; gap: 60px; margin-top: 40px; flex-wrap: wrap; }
+  .card { background: white; border-radius: 20px; padding: 30px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); width: 250px; }
+  .card img { width: 150px; height: 150px; }
+  .card h3 { margin-top: 15px; color: #333; }
+  .card p { color: #888; font-size: 14px; margin-top: 8px; }
+</style>
+</head>
+<body>
+  <h1>图片风格对比 — A (SVG手绘) vs C (Twemoji)</h1>
+
+  <h2 style="margin-top:30px;color:#888">🐱 猫</h2>
+  <div class="row">
+    <div class="card">
+      <img src="assets/samples/cat-svg.svg" alt="SVG手绘猫">
+      <h3>A. SVG 手绘</h3>
+    </div>
+    <div class="card">
+      <img src="assets/samples/cat-twemoji.svg" alt="Twemoji猫">
+      <h3>C. Twemoji</h3>
+    </div>
+  </div>
+
+  <h2 style="margin-top:40px;color:#888">🐰 兔子</h2>
+  <div class="row">
+    <div class="card">
+      <img src="assets/samples/rabbit-svg.svg" alt="SVG手绘兔子">
+      <h3>A. SVG 手绘</h3>
+    </div>
+    <div class="card">
+      <img src="assets/samples/rabbit-twemoji.svg" alt="Twemoji兔子">
+      <h3>C. Twemoji</h3>
+    </div>
+  </div>
+</body>
+</html>

@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">
+  <!-- Tail feathers -->
+  <ellipse cx="155" cy="120" rx="25" ry="10" fill="#5ABE5A" transform="rotate(-20,155,120)"/>
+  <ellipse cx="158" cy="128" rx="22" ry="8" fill="#7ED47E" transform="rotate(-10,158,128)"/>
+  <!-- Body -->
+  <ellipse cx="100" cy="115" rx="45" ry="42" fill="#7ED47E"/>
+  <!-- Belly -->
+  <ellipse cx="98" cy="125" rx="28" ry="25" fill="#FFFACD"/>
+  <!-- Head -->
+  <circle cx="95" cy="72" r="35" fill="#7ED47E"/>
+  <!-- Wing -->
+  <ellipse cx="130" cy="110" rx="25" ry="18" fill="#5ABE5A" transform="rotate(10,130,110)"/>
+  <!-- Eyes -->
+  <ellipse cx="82" cy="68" rx="10" ry="11" fill="white"/>
+  <ellipse cx="110" cy="68" rx="10" ry="11" fill="white"/>
+  <circle cx="84" cy="69" r="6" fill="#3A3A3A"/>
+  <circle cx="112" cy="69" r="6" fill="#3A3A3A"/>
+  <circle cx="86" cy="66" r="2.5" fill="white"/>
+  <circle cx="114" cy="66" r="2.5" fill="white"/>
+  <!-- Beak -->
+  <polygon points="88,82 100,92 76,92" fill="#FFB347"/>
+  <!-- Cheeks -->
+  <circle cx="70" cy="82" r="7" fill="#FFB6C1" opacity="0.5"/>
+  <circle cx="122" cy="82" r="7" fill="#FFB6C1" opacity="0.5"/>
+  <!-- Feet -->
+  <path d="M82,155 L78,170 M82,155 L85,170 M82,155 L72,168" stroke="#FFB347" stroke-width="3" fill="none" stroke-linecap="round"/>
+  <path d="M112,155 L108,170 M112,155 L115,170 M112,155 L102,168" stroke="#FFB347" stroke-width="3" fill="none" stroke-linecap="round"/>
+  <!-- Crest -->
+  <ellipse cx="95" cy="42" rx="5" ry="12" fill="#5ABE5A" transform="rotate(-10,95,42)"/>
+  <ellipse cx="102" cy="44" rx="4" ry="10" fill="#7ED47E" transform="rotate(10,102,44)"/>
+</svg>
