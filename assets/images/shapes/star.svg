@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">
+  <defs>
+    <radialGradient id="stg" cx="40%" cy="35%" r="60%">
+      <stop offset="0%" stop-color="#ffeaa7"/>
+      <stop offset="40%" stop-color="#fdcb6e"/>
+      <stop offset="100%" stop-color="#e17055"/>
+    </radialGradient>
+    <radialGradient id="sth" cx="38%" cy="32%" r="25%">
+      <stop offset="0%" stop-color="rgba(255,255,255,0.6)"/>
+      <stop offset="100%" stop-color="rgba(255,255,255,0)"/>
+    </radialGradient>
+  </defs>
+  <path d="M100 12 L120 72 Q122 78 128 78 L186 82 Q192 83 189 88 L142 128 Q138 132 139 138 L154 192 Q155 198 150 195 L104 164 Q100 162 96 164 L50 195 Q45 198 46 192 L61 138 Q62 132 58 128 L11 88 Q8 83 14 82 L72 78 Q78 78 80 72 Z" fill="url(#stg)" stroke="#e17055" stroke-width="2" stroke-linejoin="round"/>
+  <path d="M100 12 L120 72 Q122 78 128 78 L186 82 Q192 83 189 88 L142 128 Q138 132 139 138 L154 192 Q155 198 150 195 L104 164 Q100 162 96 164 L50 195 Q45 198 46 192 L61 138 Q62 132 58 128 L11 88 Q8 83 14 82 L72 78 Q78 78 80 72 Z" fill="url(#sth)"/>
+</svg>

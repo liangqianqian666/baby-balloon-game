@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">
+  <!-- Tail -->
+  <polygon points="148,115 175,95 172,120 178,110" fill="#FFE066"/>
+  <!-- Body -->
+  <ellipse cx="100" cy="125" rx="55" ry="45" fill="#FFE066"/>
+  <!-- Belly -->
+  <ellipse cx="98" cy="135" rx="35" ry="28" fill="#FFF8DC"/>
+  <!-- Head -->
+  <circle cx="95" cy="72" r="38" fill="#FFE066"/>
+  <!-- Wing -->
+  <ellipse cx="135" cy="120" rx="22" ry="15" fill="#FFD030" transform="rotate(15,135,120)"/>
+  <!-- Eyes -->
+  <ellipse cx="80" cy="67" rx="10" ry="11" fill="white"/>
+  <ellipse cx="108" cy="67" rx="10" ry="11" fill="white"/>
+  <circle cx="82" cy="68" r="6" fill="#3A3A3A"/>
+  <circle cx="110" cy="68" r="6" fill="#3A3A3A"/>
+  <circle cx="84" cy="65" r="2.5" fill="white"/>
+  <circle cx="112" cy="65" r="2.5" fill="white"/>
+  <!-- Beak -->
+  <ellipse cx="88" cy="88" rx="18" ry="8" fill="#FF9933"/>
+  <line x1="72" y1="88" x2="104" y2="88" stroke="#E8862A" stroke-width="1.2"/>
+  <!-- Cheeks -->
+  <circle cx="68" cy="82" r="7" fill="#FFB6C1" opacity="0.5"/>
+  <circle cx="118" cy="82" r="7" fill="#FFB6C1" opacity="0.5"/>
+  <!-- Feet -->
+  <ellipse cx="82" cy="170" rx="16" ry="7" fill="#FF9933"/>
+  <ellipse cx="116" cy="170" rx="16" ry="7" fill="#FF9933"/>
+</svg>

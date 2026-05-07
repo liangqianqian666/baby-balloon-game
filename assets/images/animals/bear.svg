@@ -1,0 +1,36 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">
+  <!-- Ears -->
+  <circle cx="62" cy="48" r="18" fill="#8B6B4A"/>
+  <circle cx="138" cy="48" r="18" fill="#8B6B4A"/>
+  <circle cx="62" cy="48" r="10" fill="#C49A6C"/>
+  <circle cx="138" cy="48" r="10" fill="#C49A6C"/>
+  <!-- Body -->
+  <ellipse cx="100" cy="132" rx="55" ry="50" fill="#8B6B4A"/>
+  <!-- Head -->
+  <circle cx="100" cy="82" r="42" fill="#8B6B4A"/>
+  <!-- Face patch -->
+  <ellipse cx="100" cy="95" rx="25" ry="18" fill="#C49A6C"/>
+  <!-- Belly -->
+  <ellipse cx="100" cy="140" rx="32" ry="28" fill="#C49A6C"/>
+  <!-- Eyes -->
+  <ellipse cx="82" cy="78" rx="10" ry="11" fill="white"/>
+  <ellipse cx="118" cy="78" rx="10" ry="11" fill="white"/>
+  <circle cx="84" cy="79" r="6" fill="#3A3A3A"/>
+  <circle cx="120" cy="79" r="6" fill="#3A3A3A"/>
+  <circle cx="86" cy="76" r="2.5" fill="white"/>
+  <circle cx="122" cy="76" r="2.5" fill="white"/>
+  <!-- Nose -->
+  <ellipse cx="100" cy="93" rx="7" ry="5" fill="#3A3A3A"/>
+  <ellipse cx="100" cy="92" rx="3" ry="1.5" fill="#666" opacity="0.4"/>
+  <!-- Mouth -->
+  <path d="M94,99 Q100,106 106,99" stroke="#3A3A3A" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+  <!-- Cheeks -->
+  <circle cx="68" cy="95" r="8" fill="#FFB6C1" opacity="0.45"/>
+  <circle cx="132" cy="95" r="8" fill="#FFB6C1" opacity="0.45"/>
+  <!-- Paws -->
+  <ellipse cx="72" cy="172" rx="16" ry="10" fill="#8B6B4A" stroke="#7A5A3A" stroke-width="1.5"/>
+  <ellipse cx="128" cy="172" rx="16" ry="10" fill="#8B6B4A" stroke="#7A5A3A" stroke-width="1.5"/>
+  <!-- Paw pads -->
+  <circle cx="72" cy="172" r="4" fill="#C49A6C"/>
+  <circle cx="128" cy="172" r="4" fill="#C49A6C"/>
+</svg>

@@ -1,5 +1,27 @@
 // balloon.js — 气球类
 
+// 全局图片缓存
+const _imageCache = {};
+function preloadImage(src) {
+  if (_imageCache[src]) return _imageCache[src];
+  const img = new Image();
+  img.src = src;
+  _imageCache[src] = img;
+  return img;
+}
+function preloadLevelImages(levelKey) {
+  const level = LEVELS[levelKey];
+  if (!level) return Promise.resolve();
+  const promises = level.items
+    .filter(item => item.display && item.display.startsWith('assets/'))
+    .map(item => new Promise(resolve => {
+      const img = preloadImage(item.display);
+      if (img.complete) resolve();
+      else { img.onload = resolve; img.onerror = resolve; }
+    }));
+  return Promise.all(promises);
+}
+
 class Balloon {
   constructor(x, y, item, radius) {
     this.homeX = x;
@@ -24,6 +46,11 @@ class Balloon {
     this.breathSpeed = 0.03 + Math.random() * 0.01;
     this.slot = 0;
     this.fadeIn = 0;
+
+    // 预加载图片
+    if (this.item.display && this.item.display.startsWith('assets/')) {
+      this._img = preloadImage(this.item.display);
+    }
   }
 
   // 颜色现在由 item 对象提供，不再使用静态 COLORS
@@ -135,8 +162,21 @@ class Balloon {
       const lineWobble = Math.sin(time * 0.03 + this.wobbleOffset) * 5;
       ctx.quadraticCurveTo(drawX + lineWobble, this.y + r * 1.8, drawX, this.y + r * 2.2);
       ctx.stroke();
+    } else if (this._img && this._img.complete && this._img.naturalWidth > 0) {
+      // === 图片模式：画白色圆底 + 图片 ===
+      ctx.fillStyle = 'rgba(255,255,255,0.85)';
+      ctx.beginPath();
+      ctx.arc(drawX, this.y, r * 1.1, 0, Math.PI * 2);
+      ctx.fill();
+      // 圆形边框
+      ctx.strokeStyle = 'rgba(0,0,0,0.08)';
+      ctx.lineWidth = 2;
+      ctx.stroke();
+      // 绘制图片
+      const imgSize = r * 1.6;
+      ctx.drawImage(this._img, drawX - imgSize / 2, this.y - imgSize / 2, imgSize, imgSize);
     } else {
-      // === 卡片模式：直接显示大 emoji，白色投影增强可见度 ===
+      // === 文本模式（数字等） ===
       ctx.font = `${r * 1.6}px Arial, sans-serif`;
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';

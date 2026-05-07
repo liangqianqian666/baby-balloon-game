@@ -1,0 +1,40 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">
+  <!-- Ears -->
+  <ellipse cx="78" cy="30" rx="12" ry="35" fill="white" stroke="#E0E0E0" stroke-width="1"/>
+  <ellipse cx="122" cy="30" rx="12" ry="35" fill="white" stroke="#E0E0E0" stroke-width="1"/>
+  <ellipse cx="78" cy="30" rx="7" ry="25" fill="#FFB6C1"/>
+  <ellipse cx="122" cy="30" rx="7" ry="25" fill="#FFB6C1"/>
+  <!-- Body -->
+  <ellipse cx="100" cy="135" rx="50" ry="48" fill="white" stroke="#E0E0E0" stroke-width="1"/>
+  <!-- Head -->
+  <circle cx="100" cy="90" r="42" fill="white" stroke="#E0E0E0" stroke-width="1"/>
+  <!-- Belly -->
+  <ellipse cx="100" cy="140" rx="30" ry="25" fill="#FFF5F5"/>
+  <!-- Eyes -->
+  <ellipse cx="82" cy="85" rx="10" ry="11" fill="white" stroke="#E0E0E0" stroke-width="0.5"/>
+  <ellipse cx="118" cy="85" rx="10" ry="11" fill="white" stroke="#E0E0E0" stroke-width="0.5"/>
+  <circle cx="84" cy="86" r="6" fill="#3A3A3A"/>
+  <circle cx="120" cy="86" r="6" fill="#3A3A3A"/>
+  <circle cx="86" cy="83" r="2.5" fill="white"/>
+  <circle cx="122" cy="83" r="2.5" fill="white"/>
+  <!-- Nose -->
+  <ellipse cx="100" cy="97" rx="4" ry="3" fill="#FF8FAB"/>
+  <!-- Mouth -->
+  <path d="M96,101 Q100,106 104,101" stroke="#3A3A3A" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+  <!-- Whiskers -->
+  <line x1="62" y1="93" x2="82" y2="96" stroke="#CCCCCC" stroke-width="1" stroke-linecap="round"/>
+  <line x1="62" y1="100" x2="82" y2="99" stroke="#CCCCCC" stroke-width="1" stroke-linecap="round"/>
+  <line x1="138" y1="93" x2="118" y2="96" stroke="#CCCCCC" stroke-width="1" stroke-linecap="round"/>
+  <line x1="138" y1="100" x2="118" y2="99" stroke="#CCCCCC" stroke-width="1" stroke-linecap="round"/>
+  <!-- Cheeks -->
+  <circle cx="70" cy="100" r="8" fill="#FFB6C1" opacity="0.45"/>
+  <circle cx="130" cy="100" r="8" fill="#FFB6C1" opacity="0.45"/>
+  <!-- Teeth -->
+  <rect x="96" y="103" width="4" height="5" rx="1" fill="white" stroke="#E0E0E0" stroke-width="0.5"/>
+  <rect x="100" y="103" width="4" height="5" rx="1" fill="white" stroke="#E0E0E0" stroke-width="0.5"/>
+  <!-- Paws -->
+  <ellipse cx="75" cy="172" rx="15" ry="10" fill="white" stroke="#E0E0E0" stroke-width="1"/>
+  <ellipse cx="125" cy="172" rx="15" ry="10" fill="white" stroke="#E0E0E0" stroke-width="1"/>
+  <!-- Tail -->
+  <circle cx="150" cy="145" r="12" fill="white" stroke="#E0E0E0" stroke-width="1"/>
+</svg>

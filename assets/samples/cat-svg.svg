@@ -1,0 +1,38 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200">
+  <!-- 圆润可爱的卡通猫 - 幼儿绘本风格 -->
+  <!-- 身体 -->
+  <ellipse cx="100" cy="140" rx="55" ry="45" fill="#FFB366" stroke="#E6944D" stroke-width="3"/>
+  <!-- 头 -->
+  <circle cx="100" cy="85" r="45" fill="#FFB366" stroke="#E6944D" stroke-width="3"/>
+  <!-- 左耳 -->
+  <polygon points="65,55 55,20 85,45" fill="#FFB366" stroke="#E6944D" stroke-width="3" stroke-linejoin="round"/>
+  <polygon points="68,52 60,28 82,47" fill="#FFB0B0"/>
+  <!-- 右耳 -->
+  <polygon points="135,55 145,20 115,45" fill="#FFB366" stroke="#E6944D" stroke-width="3" stroke-linejoin="round"/>
+  <polygon points="132,52 140,28 118,47" fill="#FFB0B0"/>
+  <!-- 眼睛 -->
+  <ellipse cx="82" cy="82" rx="10" ry="11" fill="white"/>
+  <ellipse cx="118" cy="82" rx="10" ry="11" fill="white"/>
+  <circle cx="85" cy="83" r="6" fill="#333"/>
+  <circle cx="121" cy="83" r="6" fill="#333"/>
+  <!-- 眼睛高光 -->
+  <circle cx="87" cy="80" r="2.5" fill="white"/>
+  <circle cx="123" cy="80" r="2.5" fill="white"/>
+  <!-- 鼻子 -->
+  <ellipse cx="100" cy="95" rx="5" ry="3.5" fill="#FF8080"/>
+  <!-- 嘴巴 -->
+  <path d="M93,99 Q100,107 107,99" fill="none" stroke="#E6944D" stroke-width="2" stroke-linecap="round"/>
+  <!-- 胡须 -->
+  <line x1="60" y1="90" x2="80" y2="93" stroke="#E6944D" stroke-width="1.5" stroke-linecap="round"/>
+  <line x1="58" y1="97" x2="79" y2="97" stroke="#E6944D" stroke-width="1.5" stroke-linecap="round"/>
+  <line x1="120" y1="93" x2="140" y2="90" stroke="#E6944D" stroke-width="1.5" stroke-linecap="round"/>
+  <line x1="121" y1="97" x2="142" y2="97" stroke="#E6944D" stroke-width="1.5" stroke-linecap="round"/>
+  <!-- 前爪 -->
+  <ellipse cx="75" cy="170" rx="15" ry="10" fill="#FFB366" stroke="#E6944D" stroke-width="2"/>
+  <ellipse cx="125" cy="170" rx="15" ry="10" fill="#FFB366" stroke="#E6944D" stroke-width="2"/>
+  <!-- 尾巴 -->
+  <path d="M150,145 Q175,130 170,105 Q168,95 160,100" fill="none" stroke="#E6944D" stroke-width="6" stroke-linecap="round"/>
+  <!-- 腮红 -->
+  <ellipse cx="68" cy="97" rx="8" ry="5" fill="#FFB0B0" opacity="0.5"/>
+  <ellipse cx="132" cy="97" rx="8" ry="5" fill="#FFB0B0" opacity="0.5"/>
+</svg>
