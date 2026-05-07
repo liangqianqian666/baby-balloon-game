@@ -1,39 +1,40 @@
 // balloon.js — 气球类
 
 class Balloon {
-  constructor(x, y, color, radius) {
+  constructor(x, y, item, radius) {
+    this.homeX = x;
+    this.homeY = y;
     this.x = x;
     this.y = y;
-    this.color = color;
-    this.radius = radius || 60;
-    this.speed = 0.5 + Math.random() * 0.5; // 上飘速度
-    this.wobbleOffset = Math.random() * Math.PI * 2; // 晃动相位
-    this.wobbleSpeed = 0.02 + Math.random() * 0.01;
-    this.wobbleAmount = 15 + Math.random() * 10;
+    this.item = item; // { id, label, color, lightColor, display }
+    this.color = item.id; // 兼容旧逻辑
+    this.radius = radius || 65;
+    this.wobbleOffset = Math.random() * Math.PI * 2;
+    this.wobbleSpeedX = 0.015 + Math.random() * 0.01;
+    this.wobbleSpeedY = 0.02 + Math.random() * 0.015;
+    this.wobbleAmountX = 8 + Math.random() * 8;
+    this.wobbleAmountY = 6 + Math.random() * 6;
     this.alive = true;
     this.popping = false;
-    this.popProgress = 0; // 0~1 爆炸动画进度
+    this.popProgress = 0;
     this.shaking = false;
     this.shakeTime = 0;
-    this.particles = []; // 爆炸碎片
+    this.particles = [];
+    this.breathOffset = Math.random() * Math.PI * 2;
+    this.breathSpeed = 0.03 + Math.random() * 0.01;
+    this.slot = 0;
+    this.fadeIn = 0;
   }
 
-  // 颜色配置
-  static COLORS = {
-    red:    { fill: '#FF4444', light: '#FF8888', name: 'RED' },
-    blue:   { fill: '#4488FF', light: '#88BBFF', name: 'BLUE' },
-    yellow: { fill: '#FFD700', light: '#FFED88', name: 'YELLOW' },
-    green:  { fill: '#44CC44', light: '#88EE88', name: 'GREEN' },
-  };
+  // 颜色现在由 item 对象提供，不再使用静态 COLORS
 
   update(time) {
     if (this.popping) {
       this.popProgress += 0.05;
-      // 更新碎片
       this.particles.forEach(p => {
         p.x += p.vx;
         p.y += p.vy;
-        p.vy += 0.3; // 重力
+        p.vy += 0.3;
         p.life -= 0.03;
       });
       if (this.popProgress >= 1) this.alive = false;
@@ -45,20 +46,15 @@ class Balloon {
       if (this.shakeTime > 20) this.shaking = false;
     }
 
-    // 上飘
-    this.y -= this.speed;
-    // 左右晃动
-    this.x += Math.sin(time * this.wobbleSpeed + this.wobbleOffset) * 0.5;
-
-    // 飘出屏幕顶部
-    if (this.y < -this.radius * 2) this.alive = false;
+    // 原地轻轻跳动/晃动（不上飘）
+    this.x = this.homeX + Math.sin(time * this.wobbleSpeedX + this.wobbleOffset) * this.wobbleAmountX;
+    this.y = this.homeY + Math.sin(time * this.wobbleSpeedY + this.wobbleOffset * 1.3) * this.wobbleAmountY;
   }
 
   pop() {
     this.popping = true;
     this.popProgress = 0;
-    const colorInfo = Balloon.COLORS[this.color];
-    // 生成碎片
+    const fillColor = this.item.color;
     for (let i = 0; i < 12; i++) {
       const angle = (Math.PI * 2 / 12) * i;
       this.particles.push({
@@ -66,7 +62,7 @@ class Balloon {
         vx: Math.cos(angle) * (3 + Math.random() * 4),
         vy: Math.sin(angle) * (3 + Math.random() * 4) - 2,
         size: 6 + Math.random() * 8,
-        color: colorInfo.fill,
+        color: fillColor,
         life: 1,
       });
     }
@@ -79,7 +75,6 @@ class Balloon {
 
   draw(ctx, time) {
     if (this.popping) {
-      // 画爆炸碎片
       this.particles.forEach(p => {
         if (p.life <= 0) return;
         ctx.globalAlpha = p.life;
@@ -98,51 +93,69 @@ class Balloon {
       drawX += Math.sin(this.shakeTime * 1.5) * 5;
     }
 
-    // 气球身体（径向渐变）
-    const colorInfo = Balloon.COLORS[this.color];
-    const grad = ctx.createRadialGradient(
-      drawX - this.radius * 0.3, this.y - this.radius * 0.3, this.radius * 0.1,
-      drawX, this.y, this.radius
-    );
-    grad.addColorStop(0, colorInfo.light);
-    grad.addColorStop(1, colorInfo.fill);
+    // 呼吸缩放
+    const breathScale = 1 + Math.sin(time * this.breathSpeed + this.breathOffset) * 0.04;
+    const r = this.radius * breathScale;
 
-    ctx.fillStyle = grad;
-    ctx.beginPath();
-    ctx.ellipse(drawX, this.y, this.radius, this.radius * 1.15, 0, 0, Math.PI * 2);
-    ctx.fill();
+    if (!this.item.display) {
+      // === 颜色模式：画气球 ===
+      const fillColor = this.item.color;
+      const lightColor = this.item.lightColor;
+      const grad = ctx.createRadialGradient(
+        drawX - r * 0.3, this.y - r * 0.3, r * 0.1,
+        drawX, this.y, r
+      );
+      grad.addColorStop(0, lightColor);
+      grad.addColorStop(1, fillColor);
 
-    // 高光
-    ctx.fillStyle = 'rgba(255,255,255,0.4)';
-    ctx.beginPath();
-    ctx.ellipse(drawX - this.radius * 0.25, this.y - this.radius * 0.35, this.radius * 0.2, this.radius * 0.3, -0.3, 0, Math.PI * 2);
-    ctx.fill();
+      ctx.fillStyle = grad;
+      ctx.beginPath();
+      ctx.ellipse(drawX, this.y, r, r * 1.15, 0, 0, Math.PI * 2);
+      ctx.fill();
 
-    // 气球底部尖角
-    ctx.fillStyle = colorInfo.fill;
-    ctx.beginPath();
-    ctx.moveTo(drawX - 8, this.y + this.radius * 1.1);
-    ctx.lineTo(drawX, this.y + this.radius * 1.3);
-    ctx.lineTo(drawX + 8, this.y + this.radius * 1.1);
-    ctx.fill();
+      // 高光
+      ctx.fillStyle = 'rgba(255,255,255,0.4)';
+      ctx.beginPath();
+      ctx.ellipse(drawX - r * 0.25, this.y - r * 0.35, r * 0.2, r * 0.3, -0.3, 0, Math.PI * 2);
+      ctx.fill();
 
-    // 挂线
-    ctx.strokeStyle = '#999';
-    ctx.lineWidth = 2;
-    ctx.beginPath();
-    ctx.moveTo(drawX, this.y + this.radius * 1.3);
-    const lineWobble = Math.sin(time * 0.03 + this.wobbleOffset) * 5;
-    ctx.quadraticCurveTo(drawX + lineWobble, this.y + this.radius * 1.8, drawX, this.y + this.radius * 2.2);
-    ctx.stroke();
+      // 气球底部尖角
+      ctx.fillStyle = fillColor;
+      ctx.beginPath();
+      ctx.moveTo(drawX - 8, this.y + r * 1.1);
+      ctx.lineTo(drawX, this.y + r * 1.3);
+      ctx.lineTo(drawX + 8, this.y + r * 1.1);
+      ctx.fill();
+
+      // 挂线
+      ctx.strokeStyle = '#999';
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.moveTo(drawX, this.y + r * 1.3);
+      const lineWobble = Math.sin(time * 0.03 + this.wobbleOffset) * 5;
+      ctx.quadraticCurveTo(drawX + lineWobble, this.y + r * 1.8, drawX, this.y + r * 2.2);
+      ctx.stroke();
+    } else {
+      // === 卡片模式：直接显示大 emoji，白色投影增强可见度 ===
+      ctx.font = `${r * 1.6}px Arial, sans-serif`;
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      // 白色阴影让 emoji 在摄像头背景上清晰可见
+      ctx.shadowColor = 'rgba(255,255,255,0.95)';
+      ctx.shadowBlur = 20;
+      ctx.shadowOffsetX = 0;
+      ctx.shadowOffsetY = 0;
+      ctx.fillText(this.item.display, drawX, this.y);
+      ctx.shadowBlur = 0;
+    }
 
     ctx.restore();
   }
 
-  // 碰撞检测：点是否在气球内
   hitTest(px, py) {
     if (this.popping) return false;
     const dx = px - this.x;
     const dy = py - this.y;
-    return (dx * dx + dy * dy) < (this.radius * this.radius * 1.3);
+    return (dx * dx + dy * dy) < (this.radius * this.radius * 2.5);
   }
 }

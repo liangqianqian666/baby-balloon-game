@@ -7,11 +7,22 @@ class Game {
     this.handCursor = new HandCursor();
     this.balloons = [];
     this.score = 0;
-    this.targetColor = null;
+    this.targetItem = null; // 当前目标 item
     this.state = 'waiting'; // waiting | playing | transition
     this.time = 0;
-    this.colorKeys = Object.keys(Balloon.COLORS);
-    this.confetti = []; // 撒花粒子
+    this.confetti = [];
+    this.balloonCount = 4;
+    this.streak = 0;
+
+    // 关卡
+    this.level = null;
+    this.levelItems = [];
+    this.starsToWin = 20; // 得到20颗星通关
+
+    // 自适应身高：追踪孩子的活动范围
+    this.bodyZone = null; // { topY, bottomY, leftX, rightX } 屏幕坐标
+    this._bodySmoothing = 0.05; // 平滑系数，慢慢跟随
+    this._calibrated = false;
 
     this.resize();
     window.addEventListener('resize', () => this.resize());
@@ -22,50 +33,223 @@ class Game {
     this.canvas.height = window.innerHeight;
   }
 
-  // 开始新一轮
-  startRound() {
-    this.balloons = [];
-    this.state = 'playing';
+  // 根据 MoveNet 关键点更新孩子的活动区域
+  // keypoints 索引: 0=nose, 1=leftEye, 2=rightEye, 5=leftShoulder, 6=rightShoulder,
+  //   9=leftWrist, 10=rightWrist, 11=leftHip, 12=rightHip
+  updateBodyZone(keypoints, videoW, videoH) {
+    if (!keypoints || keypoints.length < 13) return;
 
-    // 随机选 3 个不同颜色
-    const shuffled = [...this.colorKeys].sort(() => Math.random() - 0.5);
-    const roundColors = shuffled.slice(0, 3);
+    const w = this.canvas.width;
+    const h = this.canvas.height;
+    const minConf = 0.3;
 
-    // 目标颜色从这 3 个里选
-    this.targetColor = roundColors[Math.floor(Math.random() * roundColors.length)];
+    // 收集可信的关键点
+    const nose = keypoints[0];
+    const leftShoulder = keypoints[5];
+    const rightShoulder = keypoints[6];
+    const leftWrist = keypoints[9];
+    const rightWrist = keypoints[10];
 
-    // 生成气球
-    const spacing = this.canvas.width / (roundColors.length + 1);
-    roundColors.forEach((color, i) => {
-      const x = spacing * (i + 1) + (Math.random() - 0.5) * 40;
-      const y = this.canvas.height + 80 + Math.random() * 100;
-      this.balloons.push(new Balloon(x, y, color, 70));
-    });
+    // 至少需要鼻子或肩膀可见
+    if ((!nose || nose.score < minConf) &&
+        (!leftShoulder || leftShoulder.score < minConf) &&
+        (!rightShoulder || rightShoulder.score < minConf)) return;
 
-    // 更新 UI 提示
-    const colorInfo = Balloon.COLORS[this.targetColor];
-    const hint = document.getElementById('color-hint');
-    hint.textContent = colorInfo.name;
-    hint.style.color = colorInfo.fill;
-    hint.style.display = 'block';
+    // 映射到屏幕坐标（镜像翻转）
+    const mapX = (kp) => (1 - kp.x / videoW) * w;
+    const mapY = (kp) => (kp.y / videoH) * h;
 
-    // 语音播报
-    AudioManager.speak(`Pop the ${this.targetColor} balloon!`);
+    // 估算头顶（鼻子往上一段距离）
+    let headTopY = h * 0.15; // 默认
+    if (nose && nose.score >= minConf) {
+      const noseY = mapY(nose);
+      // 头顶大约在鼻子上方，头部高度约为肩宽的 0.7 倍
+      let headHeight = h * 0.08;
+      if (leftShoulder && rightShoulder &&
+          leftShoulder.score >= minConf && rightShoulder.score >= minConf) {
+        headHeight = Math.abs(mapX(leftShoulder) - mapX(rightShoulder)) * 0.7;
+      }
+      headTopY = noseY - headHeight;
+    }
+
+    // 估算手能举到的最高点：头顶再往上一个手臂长度（约肩宽 * 1.5）
+    let armReach = h * 0.15;
+    if (leftShoulder && rightShoulder &&
+        leftShoulder.score >= minConf && rightShoulder.score >= minConf) {
+      armReach = Math.abs(mapX(leftShoulder) - mapX(rightShoulder)) * 1.5;
+    }
+    const reachTopY = Math.max(30, headTopY - armReach * 0.3);
+
+    // 左右范围：身体中心 ± 手臂伸展
+    let centerX = w / 2;
+    if (leftShoulder && rightShoulder &&
+        leftShoulder.score >= minConf && rightShoulder.score >= minConf) {
+      centerX = (mapX(leftShoulder) + mapX(rightShoulder)) / 2;
+    } else if (nose && nose.score >= minConf) {
+      centerX = mapX(nose);
+    }
+    const reachLeftX = Math.max(70, centerX - armReach * 1.5);
+    const reachRightX = Math.min(w - 70, centerX + armReach * 1.5);
+
+    // 底部范围：肩膀附近（不要太低，低了孩子反而不举手了）
+    let shoulderY = h * 0.5;
+    if (leftShoulder && leftShoulder.score >= minConf) {
+      shoulderY = mapY(leftShoulder);
+    } else if (rightShoulder && rightShoulder.score >= minConf) {
+      shoulderY = mapY(rightShoulder);
+    }
+    const reachBottomY = shoulderY - armReach * 0.1; // 稍微高于肩膀
+
+    const target = {
+      topY: reachTopY,
+      bottomY: reachBottomY,
+      leftX: reachLeftX,
+      rightX: reachRightX,
+      centerX: centerX,
+    };
+
+    // 平滑更新
+    if (!this.bodyZone) {
+      this.bodyZone = target;
+      this._calibrated = true;
+    } else {
+      const s = this._bodySmoothing;
+      this.bodyZone.topY += (target.topY - this.bodyZone.topY) * s;
+      this.bodyZone.bottomY += (target.bottomY - this.bodyZone.bottomY) * s;
+      this.bodyZone.leftX += (target.leftX - this.bodyZone.leftX) * s;
+      this.bodyZone.rightX += (target.rightX - this.bodyZone.rightX) * s;
+      this.bodyZone.centerX += (target.centerX - this.bodyZone.centerX) * s;
+    }
+
+    // 重新定位气球到活动区域
+    this._repositionBalloons();
   }
 
-  // 每帧更新
+  _repositionBalloons() {
+    if (!this.bodyZone) return;
+    this.balloons.forEach(b => {
+      if (b.popping) return;
+      const pos = this._getCirclePosition(b.slot, this.balloonCount);
+      // 缓慢移动到新位置
+      b.homeX += (pos.x - b.homeX) * 0.03;
+      b.homeY += (pos.y - b.homeY) * 0.03;
+    });
+  }
+
+  // 半圆分布，自适应孩子活动区域
+  _getCirclePosition(index, total) {
+    const w = this.canvas.width;
+    const h = this.canvas.height;
+
+    let centerX, centerY, radiusX, radiusY;
+
+    if (this.bodyZone) {
+      // 根据孩子身体位置动态计算
+      centerX = this.bodyZone.centerX;
+      centerY = this.bodyZone.bottomY;
+      radiusX = (this.bodyZone.rightX - this.bodyZone.leftX) / 2;
+      radiusY = (this.bodyZone.bottomY - this.bodyZone.topY) * 0.85;
+    } else {
+      // 默认位置
+      centerX = w / 2;
+      centerY = h * 0.45;
+      radiusX = Math.min(w * 0.4, 450);
+      radiusY = Math.min(h * 0.32, 280);
+    }
+
+    // 从左到右的浅弧
+    const arcStart = Math.PI * 0.86;
+    const arcEnd = Math.PI * 0.14;
+    const arcRange = arcStart - arcEnd;
+    const angle = arcStart - (arcRange / (total - 1)) * index;
+    const x = centerX + Math.cos(angle) * radiusX;
+    const y = centerY - Math.sin(angle) * radiusY;
+    return { x, y };
+  }
+
+  // 找一个空的位置 slot
+  _findEmptySlot() {
+    const usedSlots = this.balloons.filter(b => !b.popping).map(b => b.slot);
+    for (let i = 0; i < this.balloonCount; i++) {
+      if (!usedSlots.includes(i)) return i;
+    }
+    return -1;
+  }
+
+  // 智能选 item（不熟的出现更多）
+  _pickNewItem() {
+    const usedIds = this.balloons.filter(b => !b.popping).map(b => b.item.id);
+    return LearningTracker.pickWeightedItem(this.level._key, usedIds);
+  }
+
+  // 添加一个新气球
+  _addBalloon(slot) {
+    const pos = this._getCirclePosition(slot, this.balloonCount);
+    const item = this._pickNewItem();
+    const b = new Balloon(pos.x, pos.y, item, 65);
+    b.slot = slot;
+    b.fadeIn = 0;
+    this.balloons.push(b);
+    return b;
+  }
+
+  // 设置关卡并开始
+  setLevel(levelKey) {
+    this.level = LEVELS[levelKey];
+    this.level._key = levelKey;
+    this.levelItems = this.level.items;
+    this.score = 0;
+    this.streak = 0;
+    document.getElementById('score').textContent = '0';
+    this.startRound();
+  }
+
+  // 初始化
+  startRound() {
+    this.balloons = [];
+    for (let i = 0; i < this.balloonCount; i++) {
+      this._addBalloon(i);
+    }
+    this.pickTarget();
+  }
+
+  // 选一个新目标
+  pickTarget() {
+    const aliveItems = this.balloons.filter(b => !b.popping).map(b => b.item);
+    if (aliveItems.length === 0) return;
+
+    this.targetItem = aliveItems[Math.floor(Math.random() * aliveItems.length)];
+    this.state = 'playing';
+
+    const hint = document.getElementById('color-hint');
+    hint.textContent = this.targetItem.label;
+    hint.style.color = this.targetItem.color;
+    hint.style.display = 'block';
+
+    // 用关卡的 prompt 模板生成语音
+    const promptText = this.level.prompt(this.targetItem);
+    AudioManager.speakGeneric(promptText);
+  }
+
   async update() {
     this.time++;
 
-    // 检测姿态
     const keypoints = await Camera.detect();
     if (keypoints) {
       const vs = Camera.getVideoSize();
       this.handCursor.update(keypoints, vs.width, vs.height, this.canvas.width, this.canvas.height);
+      // 根据身体关键点自适应气球位置
+      this.updateBodyZone(keypoints, vs.width, vs.height);
     }
 
     // 更新气球
-    this.balloons.forEach(b => b.update(this.time));
+    this.balloons.forEach(b => {
+      b.update(this.time);
+      // 淡入
+      if (b.fadeIn !== undefined && b.fadeIn < 1) {
+        b.fadeIn = Math.min(1, b.fadeIn + 0.02);
+      }
+    });
     this.balloons = this.balloons.filter(b => b.alive);
 
     // 更新撒花
@@ -83,27 +267,23 @@ class Game {
       const hands = this.handCursor.getActivePositions();
       for (const hand of hands) {
         for (const balloon of this.balloons) {
+          if (balloon.popping) continue;
+          if (balloon.fadeIn !== undefined && balloon.fadeIn < 0.8) continue;
           if (balloon.hitTest(hand.x, hand.y)) {
-            if (balloon.color === this.targetColor) {
-              // 答对！
+            if (balloon.item.id === this.targetItem.id) {
               this.onCorrect(balloon);
             } else {
-              // 答错
               this.onWrong(balloon);
             }
-            break; // 一次只处理一个碰撞
+            break;
           }
         }
       }
     }
-
-    // 如果所有气球都飘走了，重新开始一轮
-    if (this.state === 'playing' && this.balloons.length === 0) {
-      this.startRound();
-    }
   }
 
   onCorrect(balloon) {
+    const slot = balloon.slot;
     balloon.pop();
     this.score++;
     document.getElementById('score').textContent = this.score;
@@ -111,19 +291,63 @@ class Game {
 
     AudioManager.playPop();
     setTimeout(() => AudioManager.playCheer(), 150);
-
-    // 撒花
     this.spawnConfetti(balloon.x, balloon.y);
 
-    // 1.5秒后下一轮
-    setTimeout(() => this.startRound(), 1800);
+    // 立即清掉旧单词
+    document.getElementById('color-hint').textContent = '⭐';
+    document.getElementById('color-hint').style.color = '#FFD700';
+
+    // 记录学习数据
+    LearningTracker.record(this.level._key, balloon.item.id, true);
+
+    // 立即说单词
+    this.streak++;
+    const word = this.level.correctSay(balloon.item);
+    AudioManager.speakColor(word, () => {
+      AudioManager.speakPraise(this.streak, () => {
+        // 通关检查
+        if (this.score >= this.starsToWin) {
+          this.onLevelComplete();
+          return;
+        }
+        this._addBalloon(slot);
+        this.pickTarget();
+      });
+    });
+  }
+
+  onLevelComplete() {
+    this.state = 'complete';
+    // 大撒花
+    for (let i = 0; i < 5; i++) {
+      setTimeout(() => {
+        this.spawnConfetti(
+          Math.random() * this.canvas.width,
+          Math.random() * this.canvas.height * 0.5
+        );
+      }, i * 200);
+    }
+
+    document.getElementById('color-hint').textContent = '🎉 Great!';
+    document.getElementById('color-hint').style.color = '#FFD700';
+
+    AudioManager.speakGeneric('You did it! Amazing!');
+    setTimeout(() => AudioManager.playCheer(), 500);
+
+    // 3秒后自动进入下一关
+    setTimeout(() => {
+      startNextLevel();
+    }, 3500);
   }
 
   onWrong(balloon) {
-    if (balloon.shaking) return; // 已在抖动中，不重复触发
+    if (balloon.shaking) return;
     balloon.shake();
+    this.streak = 0;
+    LearningTracker.record(this.level._key, balloon.item.id, false);
     AudioManager.playWrong();
-    AudioManager.speak(`Try again! Find the ${this.targetColor} one!`);
+    const wrongText = this.level.wrongSay(balloon.item, this.targetItem);
+    AudioManager.speakGeneric(wrongText);
   }
 
   spawnConfetti(x, y) {
@@ -142,24 +366,21 @@ class Game {
     }
   }
 
-  // 渲染
   draw() {
     const ctx = this.ctx;
     ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
 
-    // 摄像头画面作为全屏背景（镜像翻转）
+    // 摄像头全屏背景
     const video = document.getElementById('pose-video');
     if (video.readyState >= 2) {
       ctx.save();
       ctx.translate(this.canvas.width, 0);
-      ctx.scale(-1, 1); // 镜像
+      ctx.scale(-1, 1);
       ctx.drawImage(video, 0, 0, this.canvas.width, this.canvas.height);
       ctx.restore();
-      // 半透明蓝色遮罩，让气球更突出
-      ctx.fillStyle = 'rgba(135, 206, 235, 0.25)';
+      ctx.fillStyle = 'rgba(135, 206, 235, 0.2)';
       ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
     } else {
-      // 摄像头未就绪时用渐变背景
       const bgGrad = ctx.createLinearGradient(0, 0, 0, this.canvas.height);
       bgGrad.addColorStop(0, '#87CEEB');
       bgGrad.addColorStop(1, '#E0F0FF');
@@ -167,11 +388,14 @@ class Game {
       ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
     }
 
-    // 几朵白云装饰
-    this.drawClouds(ctx);
-
-    // 气球
-    this.balloons.forEach(b => b.draw(ctx, this.time));
+    // 气球（支持淡入）
+    this.balloons.forEach(b => {
+      if (b.fadeIn !== undefined && b.fadeIn < 1 && !b.popping) {
+        ctx.globalAlpha = b.fadeIn;
+      }
+      b.draw(ctx, this.time);
+      ctx.globalAlpha = 1;
+    });
 
     // 撒花
     this.confetti.forEach(c => {
@@ -184,21 +408,7 @@ class Game {
       ctx.restore();
     });
 
-    // 不再画手掌光标，用真实手臂
-  }
-
-  drawClouds(ctx) {
-    ctx.fillStyle = 'rgba(255,255,255,0.6)';
-    const drawCloud = (x, y, s) => {
-      ctx.beginPath();
-      ctx.arc(x, y, 30 * s, 0, Math.PI * 2);
-      ctx.arc(x + 25 * s, y - 10 * s, 25 * s, 0, Math.PI * 2);
-      ctx.arc(x + 50 * s, y, 30 * s, 0, Math.PI * 2);
-      ctx.arc(x + 20 * s, y + 10 * s, 20 * s, 0, Math.PI * 2);
-      ctx.fill();
-    };
-    drawCloud(150, 80, 1);
-    drawCloud(this.canvas.width - 200, 120, 1.2);
-    drawCloud(this.canvas.width / 2, 60, 0.8);
+    // 手部高亮光标
+    this.handCursor.draw(ctx);
   }
 }

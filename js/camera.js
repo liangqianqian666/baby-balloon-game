@@ -21,7 +21,6 @@ const Camera = {
     await new Promise(resolve => {
       this.video.onloadedmetadata = () => {
         this.video.play();
-        cameraPreview.play();
         resolve();
       };
     });

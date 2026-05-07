@@ -1,50 +1,142 @@
 // audio.js — 语音播报 + 音效
 
 const AudioManager = {
+  _cache: {},       // 缓存已加载的 Audio 对象
+  _ttsReady: false, // 后备 TTS
   _preferredVoice: null,
-  _voiceReady: false,
 
-  // 初始化：选一个好听的英文女声
   init() {
+    // 预加载所有语音文件
+    const files = [
+      'pop-red', 'pop-blue', 'pop-yellow', 'pop-green', 'pop-purple', 'pop-orange', 'pop-pink',
+      'praise-1', 'praise-2', 'praise-3', 'praise-4', 'praise-5',
+      'thats-red', 'thats-blue', 'thats-yellow', 'thats-green', 'thats-purple', 'thats-orange', 'thats-pink',
+      'find-red', 'find-blue', 'find-yellow', 'find-green', 'find-purple', 'find-orange', 'find-pink',
+    ];
+    files.forEach(name => {
+      const audio = new Audio(`assets/voices/${name}.mp3`);
+      audio.preload = 'auto';
+      this._cache[name] = audio;
+    });
+
+    // 后备：初始化 Web Speech API
     const findVoice = () => {
       const voices = speechSynthesis.getVoices();
-      // 优先选 Samantha(Mac)、Google UK Female、Karen 等清晰女声
-      const preferred = [
-        'Samantha', 'Karen', 'Victoria', 'Moira',
-        'Google UK English Female', 'Google US English',
-        'Microsoft Zira', 'Fiona'
-      ];
+      const preferred = ['Samantha', 'Karen', 'Google UK English Female', 'Google US English'];
       for (const name of preferred) {
         const v = voices.find(v => v.name.includes(name));
         if (v) { this._preferredVoice = v; break; }
       }
-      // 兜底：任意英文女声
       if (!this._preferredVoice) {
         this._preferredVoice = voices.find(v => v.lang.startsWith('en')) || null;
       }
-      this._voiceReady = true;
+      this._ttsReady = true;
     };
-    // Chrome 异步加载 voices
-    if (speechSynthesis.getVoices().length) {
-      findVoice();
-    } else {
-      speechSynthesis.onvoiceschanged = findVoice;
+    if (speechSynthesis.getVoices().length) findVoice();
+    else speechSynthesis.onvoiceschanged = findVoice;
+  },
+
+  // 播放预录音频
+  _play(name, onEnd) {
+    const audio = this._cache[name];
+    if (audio) {
+      const clone = audio.cloneNode(); // 允许重叠播放
+      if (onEnd) clone.onended = onEnd;
+      clone.play().catch(() => {});
+      return true;
+    }
+    return false;
+  },
+
+  // 后备 TTS
+  _speakTTS(text) {
+    const u = new SpeechSynthesisUtterance(text);
+    u.lang = 'en-US';
+    u.rate = 0.65;
+    u.pitch = 1.4;
+    if (this._preferredVoice) u.voice = this._preferredVoice;
+    speechSynthesis.cancel();
+    speechSynthesis.speak(u);
+  },
+
+  // --- 游戏语音接口 ---
+
+  // 通用语音朗读（用于关卡指令和错误提示）
+  speakGeneric(text, onDone) {
+    const u = new SpeechSynthesisUtterance(text);
+    u.lang = 'en-US';
+    u.rate = 0.7;
+    u.pitch = 1.4;
+    if (this._preferredVoice) u.voice = this._preferredVoice;
+    if (onDone) u.onend = onDone;
+    speechSynthesis.cancel();
+    speechSynthesis.speak(u);
+  },
+
+  // "Pop the [color] balloon!" (保留兼容)
+  speakPopCommand(color) {
+    if (!this._play(`pop-${color}`)) {
+      this._speakTTS(`Pop the ${color} balloon!`);
     }
   },
 
-  speak(text, onEnd) {
-    const utterance = new SpeechSynthesisUtterance(text);
-    utterance.lang = 'en-US';
-    utterance.rate = 0.8;   // 慢速
-    utterance.pitch = 1.3;  // 稍高，可爱
-    utterance.volume = 1;
-    if (this._preferredVoice) utterance.voice = this._preferredVoice;
-    if (onEnd) utterance.onend = onEnd;
+  // 答对：只说颜色名（立即）
+  speakColor(color, onDone) {
+    // 用 TTS 快速说一个单词，比加载 mp3 更即时
+    const u = new SpeechSynthesisUtterance(color);
+    u.lang = 'en-US';
+    u.rate = 0.7;
+    u.pitch = 1.4;
+    if (this._preferredVoice) u.voice = this._preferredVoice;
+    if (onDone) u.onend = onDone;
     speechSynthesis.cancel();
-    speechSynthesis.speak(utterance);
+    speechSynthesis.speak(u);
   },
 
-  // ---- 合成音效（更可爱的版本）----
+  // 表扬（根据连击等级递进）
+  speakPraise(streak, onDone) {
+    // 根据 streak 选不同等级的表扬语
+    let text;
+    if (streak <= 1) {
+      const words = ['Good!', 'Yes!', 'Nice!'];
+      text = words[Math.floor(Math.random() * words.length)];
+    } else if (streak <= 3) {
+      const words = ['Great job!', 'Well done!', 'Awesome!'];
+      text = words[Math.floor(Math.random() * words.length)];
+    } else if (streak <= 5) {
+      const words = ['Amazing!', 'Fantastic!', 'Brilliant!'];
+      text = words[Math.floor(Math.random() * words.length)];
+    } else {
+      const words = ['Incredible!', 'Superstar!', 'You are on fire!', 'Unstoppable!'];
+      text = words[Math.floor(Math.random() * words.length)];
+    }
+
+    const u = new SpeechSynthesisUtterance(text);
+    u.lang = 'en-US';
+    u.rate = streak > 5 ? 0.9 : 0.75; // 高连击语速更快更兴奋
+    u.pitch = Math.min(1.8, 1.3 + streak * 0.05); // 连击越多音调越高
+    if (this._preferredVoice) u.voice = this._preferredVoice;
+    if (onDone) u.onend = onDone;
+    speechSynthesis.speak(u);
+  },
+
+  // 答对（保留兼容）
+  speakCorrect(color, onDone) {
+    this.speakColor(color, () => {
+      this.speakPraise(onDone);
+    });
+  },
+
+  // 答错："That's [wrong color]. Can you find the [target] one?"
+  speakWrong(wrongColor, targetColor) {
+    this._play(`thats-${wrongColor}`, () => {
+      setTimeout(() => {
+        this._play(`find-${targetColor}`);
+      }, 300);
+    });
+  },
+
+  // --- 合成音效 ---
 
   _ctx: null,
   _getCtx() {
@@ -52,12 +144,10 @@ const AudioManager = {
     return this._ctx;
   },
 
-  // 气球爆炸：短促清脆的 "啵" 声
   playPop() {
     const ctx = this._getCtx();
     const t = ctx.currentTime;
 
-    // 噪声 burst（模拟气球破裂）
     const bufferSize = ctx.sampleRate * 0.08;
     const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
     const data = buffer.getChannelData(0);
@@ -66,29 +156,24 @@ const AudioManager = {
     }
     const noise = ctx.createBufferSource();
     noise.buffer = buffer;
-
-    // 高通滤波让它更清脆
     const filter = ctx.createBiquadFilter();
     filter.type = 'highpass';
     filter.frequency.value = 2000;
-
     const gain = ctx.createGain();
-    gain.gain.setValueAtTime(0.4, t);
+    gain.gain.setValueAtTime(0.3, t);
     gain.gain.exponentialRampToValueAtTime(0.01, t + 0.08);
-
     noise.connect(filter);
     filter.connect(gain);
     gain.connect(ctx.destination);
     noise.start(t);
     noise.stop(t + 0.08);
 
-    // 加一个短促高音 "叮"
     const osc = ctx.createOscillator();
     const oscGain = ctx.createGain();
     osc.type = 'sine';
     osc.frequency.setValueAtTime(1200, t);
     osc.frequency.exponentialRampToValueAtTime(800, t + 0.1);
-    oscGain.gain.setValueAtTime(0.2, t);
+    oscGain.gain.setValueAtTime(0.15, t);
     oscGain.gain.exponentialRampToValueAtTime(0.01, t + 0.1);
     osc.connect(oscGain);
     oscGain.connect(ctx.destination);
@@ -96,12 +181,10 @@ const AudioManager = {
     osc.stop(t + 0.1);
   },
 
-  // 答对欢呼：可爱的上升琶音 + 闪亮音
   playCheer() {
     const ctx = this._getCtx();
     const t = ctx.currentTime;
-    // 上升琶音 C E G C（八度）用正弦波，柔和
-    const notes = [784, 988, 1175, 1568]; // G5 B5 D6 G6
+    const notes = [784, 988, 1175, 1568];
     notes.forEach((freq, i) => {
       const osc = ctx.createOscillator();
       const gain = ctx.createGain();
@@ -109,43 +192,29 @@ const AudioManager = {
       osc.connect(gain);
       gain.connect(ctx.destination);
       osc.frequency.value = freq;
-      const start = t + i * 0.08;
+      const start = t + i * 0.1;
       gain.gain.setValueAtTime(0, start);
-      gain.gain.linearRampToValueAtTime(0.25, start + 0.02);
-      gain.gain.exponentialRampToValueAtTime(0.01, start + 0.25);
+      gain.gain.linearRampToValueAtTime(0.2, start + 0.02);
+      gain.gain.exponentialRampToValueAtTime(0.01, start + 0.3);
       osc.start(start);
-      osc.stop(start + 0.25);
+      osc.stop(start + 0.3);
     });
-
-    // 结尾闪亮 shimmer
-    const shimmer = ctx.createOscillator();
-    const sGain = ctx.createGain();
-    shimmer.type = 'sine';
-    shimmer.frequency.value = 2093; // C7
-    shimmer.connect(sGain);
-    sGain.connect(ctx.destination);
-    const sStart = t + 0.35;
-    sGain.gain.setValueAtTime(0.15, sStart);
-    sGain.gain.exponentialRampToValueAtTime(0.01, sStart + 0.4);
-    shimmer.start(sStart);
-    shimmer.stop(sStart + 0.4);
   },
 
-  // 答错：轻柔的两声 "嘟嘟"
   playWrong() {
     const ctx = this._getCtx();
     const t = ctx.currentTime;
-    [0, 0.2].forEach((delay, i) => {
+    [0, 0.25].forEach((delay, i) => {
       const osc = ctx.createOscillator();
       const gain = ctx.createGain();
       osc.type = 'sine';
       osc.connect(gain);
       gain.connect(ctx.destination);
-      osc.frequency.value = i === 0 ? 440 : 370; // A4 → F#4 下降
-      gain.gain.setValueAtTime(0.15, t + delay);
-      gain.gain.exponentialRampToValueAtTime(0.01, t + delay + 0.15);
+      osc.frequency.value = i === 0 ? 440 : 370;
+      gain.gain.setValueAtTime(0.12, t + delay);
+      gain.gain.exponentialRampToValueAtTime(0.01, t + delay + 0.18);
       osc.start(t + delay);
-      osc.stop(t + delay + 0.15);
+      osc.stop(t + delay + 0.18);
     });
   }
 };
