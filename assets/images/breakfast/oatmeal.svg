@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">
+  <!-- Bowl -->
+  <ellipse cx="100" cy="145" rx="65" ry="18" fill="#FDEBD0"/>
+  <path d="M35,125 Q35,165 100,170 Q165,165 165,125Z" fill="#FDEBD0" stroke="#E8C9A0" stroke-width="1.5"/>
+  <ellipse cx="100" cy="125" rx="65" ry="20" fill="#F5DEB3"/>
+  <!-- Oatmeal surface -->
+  <ellipse cx="100" cy="120" rx="55" ry="15" fill="#F0D9A8"/>
+  <!-- Toppings -->
+  <circle cx="80" cy="115" r="5" fill="#FF6B6B"/>
+  <circle cx="95" cy="110" r="4" fill="#6BCB77"/>
+  <circle cx="115" cy="112" r="5" fill="#FF6B6B"/>
+  <circle cx="105" cy="118" r="4" fill="#87CEEB"/>
+  <!-- Eyes -->
+  <circle cx="85" cy="115" r="4" fill="#3A3A3A"/>
+  <circle cx="115" cy="115" r="4" fill="#3A3A3A"/>
+  <circle cx="86" cy="114" r="1.5" fill="white"/>
+  <circle cx="116" cy="114" r="1.5" fill="white"/>
+  <!-- Mouth -->
+  <path d="M93,125 Q100,131 107,125" stroke="#3A3A3A" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+  <!-- Spoon -->
+  <ellipse cx="155" cy="100" rx="12" ry="7" fill="#C0C0C0" transform="rotate(30 155 100)"/>
+  <rect x="152" y="105" width="5" height="50" rx="2" fill="#C0C0C0" transform="rotate(30 155 130)"/>
+</svg>

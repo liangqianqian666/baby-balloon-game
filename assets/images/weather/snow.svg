@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">
+  <!-- Main snowflake arms -->
+  <line x1="100" y1="30" x2="100" y2="170" stroke="#90CAF9" stroke-width="6" stroke-linecap="round"/>
+  <line x1="40" y1="65" x2="160" y2="135" stroke="#90CAF9" stroke-width="6" stroke-linecap="round"/>
+  <line x1="40" y1="135" x2="160" y2="65" stroke="#90CAF9" stroke-width="6" stroke-linecap="round"/>
+  <!-- Branch details -->
+  <line x1="100" y1="50" x2="85" y2="60" stroke="#90CAF9" stroke-width="4" stroke-linecap="round"/>
+  <line x1="100" y1="50" x2="115" y2="60" stroke="#90CAF9" stroke-width="4" stroke-linecap="round"/>
+  <line x1="100" y1="150" x2="85" y2="140" stroke="#90CAF9" stroke-width="4" stroke-linecap="round"/>
+  <line x1="100" y1="150" x2="115" y2="140" stroke="#90CAF9" stroke-width="4" stroke-linecap="round"/>
+  <line x1="55" y1="75" x2="60" y2="60" stroke="#90CAF9" stroke-width="4" stroke-linecap="round"/>
+  <line x1="145" y1="125" x2="140" y2="140" stroke="#90CAF9" stroke-width="4" stroke-linecap="round"/>
+  <line x1="55" y1="125" x2="60" y2="140" stroke="#90CAF9" stroke-width="4" stroke-linecap="round"/>
+  <line x1="145" y1="75" x2="140" y2="60" stroke="#90CAF9" stroke-width="4" stroke-linecap="round"/>
+  <!-- Center -->
+  <circle cx="100" cy="100" r="10" fill="#E3F2FD" stroke="#90CAF9" stroke-width="3"/>
+</svg>

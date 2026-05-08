@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">
+  <!-- Rind -->
+  <path d="M30,120 Q100,10 170,120Z" fill="#4CAF50"/>
+  <!-- Inner rind -->
+  <path d="M38,118 Q100,22 162,118Z" fill="#A5D6A7"/>
+  <!-- Red flesh -->
+  <path d="M42,118 Q100,30 158,118Z" fill="#FF6B6B"/>
+  <!-- Seeds -->
+  <ellipse cx="80" cy="90" rx="3" ry="5" fill="#3A3A3A"/>
+  <ellipse cx="100" cy="80" rx="3" ry="5" fill="#3A3A3A"/>
+  <ellipse cx="120" cy="90" rx="3" ry="5" fill="#3A3A3A"/>
+  <ellipse cx="90" cy="105" rx="3" ry="5" fill="#3A3A3A"/>
+  <ellipse cx="110" cy="105" rx="3" ry="5" fill="#3A3A3A"/>
+  <!-- Bottom line -->
+  <line x1="30" y1="120" x2="170" y2="120" stroke="#388E3C" stroke-width="3"/>
+  <!-- Eyes -->
+  <circle cx="85" cy="75" r="5" fill="white"/>
+  <circle cx="115" cy="75" r="5" fill="white"/>
+  <circle cx="86" cy="76" r="3" fill="#3A3A3A"/>
+  <circle cx="116" cy="76" r="3" fill="#3A3A3A"/>
+  <circle cx="88" cy="74" r="1.5" fill="white"/>
+  <circle cx="118" cy="74" r="1.5" fill="white"/>
+  <!-- Mouth -->
+  <path d="M93,88 Q100,95 107,88" stroke="#3A3A3A" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+</svg>

@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">
+  <!-- Cup body -->
+  <path d="M55,60 L65,165 Q65,175 100,175 Q135,175 135,165 L145,60 Z" fill="#42A5F5" stroke="#1E88E5" stroke-width="2"/>
+  <!-- Handle -->
+  <path d="M145,80 Q175,80 175,110 Q175,140 145,140" fill="none" stroke="#1E88E5" stroke-width="8" stroke-linecap="round"/>
+  <!-- Rim -->
+  <ellipse cx="100" cy="60" rx="45" ry="8" fill="#1E88E5"/>
+  <!-- Liquid -->
+  <ellipse cx="100" cy="65" rx="38" ry="6" fill="#FFCC80"/>
+  <!-- Star decoration -->
+  <polygon points="100,110 103,118 112,118 105,123 107,131 100,127 93,131 95,123 88,118 97,118" fill="#FFF176"/>
+</svg>

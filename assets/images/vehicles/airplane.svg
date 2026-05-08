@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">
+  <!-- Body -->
+  <ellipse cx="100" cy="105" rx="80" ry="25" fill="white" stroke="#E0E0E0" stroke-width="1.5"/>
+  <!-- Nose -->
+  <path d="M180,105 L195,105 Q200,105 195,103 L180,95Z" fill="#E0E0E0"/>
+  <!-- Tail -->
+  <polygon points="20,80 20,105 35,105 35,95" fill="#87CEEB"/>
+  <!-- Windows -->
+  <circle cx="70" cy="100" r="7" fill="#87CEEB"/>
+  <circle cx="90" cy="100" r="7" fill="#87CEEB"/>
+  <circle cx="110" cy="100" r="7" fill="#87CEEB"/>
+  <circle cx="130" cy="100" r="7" fill="#87CEEB"/>
+  <!-- Cockpit -->
+  <path d="M155,95 Q170,90 175,100 Q175,110 160,110Z" fill="#B0E0E6"/>
+  <!-- Wing -->
+  <path d="M60,105 L40,150 L130,150 L120,105Z" fill="#E8E8E8" stroke="#D0D0D0" stroke-width="1"/>
+  <!-- Engine -->
+  <ellipse cx="80" cy="150" rx="20" ry="8" fill="#BDBDBD"/>
+  <ellipse cx="120" cy="150" rx="20" ry="8" fill="#BDBDBD"/>
+  <!-- Eyes -->
+  <circle cx="162" cy="98" r="4" fill="#3A3A3A"/>
+  <circle cx="172" cy="98" r="4" fill="#3A3A3A"/>
+  <circle cx="163" cy="97" r="1.5" fill="white"/>
+  <circle cx="173" cy="97" r="1.5" fill="white"/>
+  <!-- Mouth -->
+  <path d="M163,106 Q167,110 172,106" stroke="#3A3A3A" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+  <!-- Red stripe -->
+  <line x1="30" y1="105" x2="175" y2="105" stroke="#FF6B6B" stroke-width="3"/>
+</svg>

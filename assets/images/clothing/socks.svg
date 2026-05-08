@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">
+  <!-- Left sock -->
+  <path d="M35,40 L35,130 Q35,160 55,160 L70,160 Q85,160 85,140 L85,130 L85,40 Z" fill="#FF7043" stroke="#E64A19" stroke-width="2"/>
+  <rect x="35" y="40" width="50" height="20" fill="#E64A19" rx="3"/>
+  <!-- Left sock stripes -->
+  <line x1="35" y1="80" x2="85" y2="80" stroke="#FFF176" stroke-width="4"/>
+  <line x1="35" y1="95" x2="85" y2="95" stroke="#FFF176" stroke-width="4"/>
+  <!-- Right sock -->
+  <path d="M115,40 L115,130 Q115,160 135,160 L150,160 Q165,160 165,140 L165,130 L165,40 Z" fill="#7C4DFF" stroke="#651FFF" stroke-width="2"/>
+  <rect x="115" y="40" width="50" height="20" fill="#651FFF" rx="3"/>
+  <!-- Right sock stripes -->
+  <line x1="115" y1="80" x2="165" y2="80" stroke="#FFF176" stroke-width="4"/>
+  <line x1="115" y1="95" x2="165" y2="95" stroke="#FFF176" stroke-width="4"/>
+</svg>

@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">
+  <!-- Face -->
+  <circle cx="100" cy="100" r="70" fill="#90CAF9"/>
+  <!-- Eyes -->
+  <circle cx="78" cy="85" r="8" fill="#3A3A3A"/>
+  <circle cx="122" cy="85" r="8" fill="#3A3A3A"/>
+  <circle cx="80" cy="83" r="3" fill="white"/>
+  <circle cx="124" cy="83" r="3" fill="white"/>
+  <!-- Tears -->
+  <ellipse cx="65" cy="105" rx="4" ry="8" fill="#42A5F5"/>
+  <ellipse cx="135" cy="105" rx="4" ry="8" fill="#42A5F5"/>
+  <!-- Sad mouth -->
+  <path d="M80,125 Q100,112 120,125" stroke="#3A3A3A" stroke-width="3" fill="none" stroke-linecap="round"/>
+  <!-- Eyebrows -->
+  <path d="M65,70 Q78,65 85,72" stroke="#3A3A3A" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+  <path d="M135,70 Q122,65 115,72" stroke="#3A3A3A" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+</svg>

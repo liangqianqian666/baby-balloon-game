@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">
+  <!-- Stack of pancakes -->
+  <ellipse cx="100" cy="145" rx="65" ry="18" fill="#D4915E"/>
+  <ellipse cx="100" cy="140" rx="62" ry="16" fill="#F4C566"/>
+  <ellipse cx="100" cy="128" rx="58" ry="16" fill="#D4915E"/>
+  <ellipse cx="100" cy="123" rx="55" ry="14" fill="#F4C566"/>
+  <ellipse cx="100" cy="112" rx="52" ry="14" fill="#D4915E"/>
+  <ellipse cx="100" cy="107" rx="50" ry="13" fill="#F4C566"/>
+  <!-- Butter -->
+  <rect x="85" y="90" width="30" height="15" rx="4" fill="#FFE88D"/>
+  <!-- Syrup drip -->
+  <path d="M75,107 Q72,130 78,145" stroke="#8B5E3C" stroke-width="5" fill="none" stroke-linecap="round" opacity="0.7"/>
+  <path d="M130,110 Q135,128 128,140" stroke="#8B5E3C" stroke-width="4" fill="none" stroke-linecap="round" opacity="0.7"/>
+  <!-- Eyes -->
+  <circle cx="85" cy="105" r="5" fill="#3A3A3A"/>
+  <circle cx="115" cy="105" r="5" fill="#3A3A3A"/>
+  <circle cx="87" cy="103" r="2" fill="white"/>
+  <circle cx="117" cy="103" r="2" fill="white"/>
+  <!-- Cheeks -->
+  <circle cx="72" cy="115" r="7" fill="#FFB6C1" opacity="0.4"/>
+  <circle cx="128" cy="115" r="7" fill="#FFB6C1" opacity="0.4"/>
+  <!-- Mouth -->
+  <path d="M93,118 Q100,124 107,118" stroke="#3A3A3A" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+</svg>

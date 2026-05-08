@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">
+  <!-- Body -->
+  <ellipse cx="100" cy="130" rx="55" ry="48" fill="white" stroke="#E0E0E0" stroke-width="1"/>
+  <!-- Spots -->
+  <circle cx="75" cy="120" r="12" fill="#3A3A3A"/>
+  <circle cx="120" cy="135" r="10" fill="#3A3A3A"/>
+  <circle cx="100" cy="150" r="8" fill="#3A3A3A"/>
+  <!-- Head -->
+  <circle cx="100" cy="80" r="40" fill="white" stroke="#E0E0E0" stroke-width="1"/>
+  <!-- Ears -->
+  <ellipse cx="62" cy="55" rx="15" ry="10" fill="white" stroke="#E0E0E0" stroke-width="1"/>
+  <ellipse cx="62" cy="55" rx="10" ry="6" fill="#FFB6C1"/>
+  <ellipse cx="138" cy="55" rx="15" ry="10" fill="white" stroke="#E0E0E0" stroke-width="1"/>
+  <ellipse cx="138" cy="55" rx="10" ry="6" fill="#FFB6C1"/>
+  <!-- Horns -->
+  <path d="M72,48 Q65,30 58,40" stroke="#8B5E3C" stroke-width="4" fill="none" stroke-linecap="round"/>
+  <path d="M128,48 Q135,30 142,40" stroke="#8B5E3C" stroke-width="4" fill="none" stroke-linecap="round"/>
+  <!-- Muzzle -->
+  <ellipse cx="100" cy="98" rx="20" ry="14" fill="#FDEBD0"/>
+  <!-- Nostrils -->
+  <circle cx="93" cy="97" r="3" fill="#3A3A3A"/>
+  <circle cx="107" cy="97" r="3" fill="#3A3A3A"/>
+  <!-- Eyes -->
+  <ellipse cx="82" cy="78" rx="8" ry="9" fill="white"/>
+  <ellipse cx="118" cy="78" rx="8" ry="9" fill="white"/>
+  <circle cx="84" cy="79" r="5" fill="#3A3A3A"/>
+  <circle cx="120" cy="79" r="5" fill="#3A3A3A"/>
+  <circle cx="86" cy="77" r="2" fill="white"/>
+  <circle cx="122" cy="77" r="2" fill="white"/>
+  <!-- Cheeks -->
+  <circle cx="70" cy="92" r="7" fill="#FFB6C1" opacity="0.4"/>
+  <circle cx="130" cy="92" r="7" fill="#FFB6C1" opacity="0.4"/>
+  <!-- Mouth -->
+  <path d="M94,105 Q100,110 106,105" stroke="#3A3A3A" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+  <!-- Bell -->
+  <circle cx="100" cy="118" r="6" fill="#FFD93D" stroke="#E6B800" stroke-width="1"/>
+</svg>

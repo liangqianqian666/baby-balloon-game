@@ -299,6 +299,7 @@ class Game {
 
     // 记录学习数据
     LearningTracker.record(this.level._key, balloon.item.id, true);
+    Analytics.track('correct', { level: this.level._key, item: balloon.item.id });
 
     // 立即说单词
     this.streak++;
@@ -345,6 +346,7 @@ class Game {
     balloon.shake();
     this.streak = 0;
     LearningTracker.record(this.level._key, balloon.item.id, false);
+    Analytics.track('wrong', { level: this.level._key, item: balloon.item.id, target: this.targetItem.id });
     AudioManager.playWrong();
     const wrongText = this.level.wrongSay(balloon.item, this.targetItem);
     AudioManager.speakGeneric(wrongText);

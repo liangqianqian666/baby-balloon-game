@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">
+  <!-- Left lens -->
+  <circle cx="72" cy="100" r="32" fill="none" stroke="#5D4037" stroke-width="7"/>
+  <circle cx="72" cy="100" r="32" fill="#E3F2FD" opacity="0.3"/>
+  <!-- Right lens -->
+  <circle cx="128" cy="100" r="32" fill="none" stroke="#5D4037" stroke-width="7"/>
+  <circle cx="128" cy="100" r="32" fill="#E3F2FD" opacity="0.3"/>
+  <!-- Bridge -->
+  <path d="M90,100 Q100,92 110,100" fill="none" stroke="#5D4037" stroke-width="6" stroke-linecap="round"/>
+  <!-- Arms -->
+  <line x1="40" y1="98" x2="20" y2="95" stroke="#5D4037" stroke-width="5" stroke-linecap="round"/>
+  <line x1="160" y1="98" x2="180" y2="95" stroke="#5D4037" stroke-width="5" stroke-linecap="round"/>
+  <!-- Shine -->
+  <circle cx="60" cy="88" r="5" fill="white" opacity="0.6"/>
+  <circle cx="116" cy="88" r="5" fill="white" opacity="0.6"/>
+</svg>

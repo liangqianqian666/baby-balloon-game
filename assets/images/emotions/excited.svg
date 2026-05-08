@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">
+  <!-- Face -->
+  <circle cx="100" cy="100" r="70" fill="#FFD54F"/>
+  <!-- Star eyes -->
+  <polygon points="78,85 81,92 89,92 83,97 85,105 78,100 71,105 73,97 67,92 75,92" fill="#FF6F00"/>
+  <polygon points="122,85 125,92 133,92 127,97 129,105 122,100 115,105 117,97 111,92 119,92" fill="#FF6F00"/>
+  <!-- Big open smile -->
+  <path d="M70,115 Q100,155 130,115" stroke="#3A3A3A" stroke-width="3" fill="white" stroke-linecap="round"/>
+  <!-- Raised eyebrows -->
+  <path d="M60,65 Q78,55 92,65" stroke="#3A3A3A" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+  <path d="M108,65 Q122,55 140,65" stroke="#3A3A3A" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+</svg>

@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">
+  <!-- Waffle body -->
+  <rect x="30" y="55" width="140" height="110" rx="12" fill="#F4C566"/>
+  <!-- Grid pattern -->
+  <line x1="72" y1="55" x2="72" y2="165" stroke="#D4915E" stroke-width="1.5"/>
+  <line x1="100" y1="55" x2="100" y2="165" stroke="#D4915E" stroke-width="1.5"/>
+  <line x1="128" y1="55" x2="128" y2="165" stroke="#D4915E" stroke-width="1.5"/>
+  <line x1="30" y1="82" x2="170" y2="82" stroke="#D4915E" stroke-width="1.5"/>
+  <line x1="30" y1="110" x2="170" y2="110" stroke="#D4915E" stroke-width="1.5"/>
+  <line x1="30" y1="138" x2="170" y2="138" stroke="#D4915E" stroke-width="1.5"/>
+  <!-- Butter -->
+  <rect x="80" y="70" width="40" height="25" rx="5" fill="#FFE88D"/>
+  <!-- Syrup -->
+  <path d="M40,80 Q38,120 50,150" stroke="#8B5E3C" stroke-width="4" fill="none" stroke-linecap="round" opacity="0.6"/>
+  <!-- Eyes -->
+  <circle cx="82" cy="105" r="6" fill="#3A3A3A"/>
+  <circle cx="118" cy="105" r="6" fill="#3A3A3A"/>
+  <circle cx="84" cy="103" r="2.5" fill="white"/>
+  <circle cx="120" cy="103" r="2.5" fill="white"/>
+  <!-- Cheeks -->
+  <circle cx="65" cy="118" r="8" fill="#FFB6C1" opacity="0.35"/>
+  <circle cx="135" cy="118" r="8" fill="#FFB6C1" opacity="0.35"/>
+  <!-- Mouth -->
+  <path d="M92,125 Q100,133 108,125" stroke="#3A3A3A" stroke-width="2" fill="none" stroke-linecap="round"/>
+</svg>

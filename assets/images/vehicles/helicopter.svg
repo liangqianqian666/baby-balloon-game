@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">
+  <!-- Body -->
+  <ellipse cx="100" cy="110" rx="50" ry="30" fill="#87CEEB"/>
+  <!-- Cockpit -->
+  <path d="M70,85 Q100,50 130,85Z" fill="#B0E0E6"/>
+  <!-- Tail -->
+  <rect x="20" y="95" width="35" height="12" rx="4" fill="#87CEEB"/>
+  <polygon points="20,85 20,118 8,100" fill="#6BB3D9"/>
+  <!-- Tail rotor -->
+  <ellipse cx="8" cy="100" rx="3" ry="12" fill="#888" opacity="0.7"/>
+  <!-- Top rotor pole -->
+  <line x1="100" y1="55" x2="100" y2="45" stroke="#3A3A3A" stroke-width="3"/>
+  <!-- Rotor blades -->
+  <line x1="40" y1="45" x2="160" y2="45" stroke="#888" stroke-width="4" stroke-linecap="round" opacity="0.6"/>
+  <!-- Skids -->
+  <line x1="60" y1="140" x2="140" y2="140" stroke="#888" stroke-width="4" stroke-linecap="round"/>
+  <line x1="75" y1="130" x2="70" y2="140" stroke="#888" stroke-width="3"/>
+  <line x1="125" y1="130" x2="130" y2="140" stroke="#888" stroke-width="3"/>
+  <!-- Windows/Eyes -->
+  <circle cx="88" cy="95" r="8" fill="white"/>
+  <circle cx="112" cy="95" r="8" fill="white"/>
+  <circle cx="90" cy="96" r="5" fill="#3A3A3A"/>
+  <circle cx="114" cy="96" r="5" fill="#3A3A3A"/>
+  <circle cx="92" cy="94" r="2" fill="white"/>
+  <circle cx="116" cy="94" r="2" fill="white"/>
+  <!-- Mouth -->
+  <path d="M93,112 Q100,118 107,112" stroke="#3A3A3A" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+</svg>

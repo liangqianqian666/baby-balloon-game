@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">
+  <!-- Left shoe -->
+  <path d="M25,130 Q25,100 50,95 L75,95 Q85,95 85,110 L85,140 Q85,155 70,155 L30,155 Q15,155 15,140 Z" fill="#FF5722" stroke="#E64A19" stroke-width="2"/>
+  <ellipse cx="50" cy="155" rx="30" ry="8" fill="#E64A19"/>
+  <circle cx="65" cy="115" r="4" fill="white"/>
+  <circle cx="65" cy="130" r="4" fill="white"/>
+  <!-- Right shoe -->
+  <path d="M115,130 Q115,100 140,95 L165,95 Q175,95 175,110 L175,140 Q175,155 160,155 L120,155 Q105,155 105,140 Z" fill="#2196F3" stroke="#1976D2" stroke-width="2"/>
+  <ellipse cx="140" cy="155" rx="30" ry="8" fill="#1976D2"/>
+  <circle cx="155" cy="115" r="4" fill="white"/>
+  <circle cx="155" cy="130" r="4" fill="white"/>
+  <!-- Laces -->
+  <path d="M55,105 L75,105" stroke="white" stroke-width="2" stroke-linecap="round"/>
+  <path d="M145,105 L165,105" stroke="white" stroke-width="2" stroke-linecap="round"/>
+</svg>

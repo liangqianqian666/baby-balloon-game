@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">
+  <!-- Face -->
+  <circle cx="100" cy="100" r="70" fill="#81C784"/>
+  <!-- Winking eyes -->
+  <circle cx="78" cy="88" r="7" fill="#3A3A3A"/>
+  <circle cx="80" cy="86" r="2.5" fill="white"/>
+  <path d="M112,88 Q122,82 132,88" stroke="#3A3A3A" stroke-width="3" fill="none" stroke-linecap="round"/>
+  <!-- Tongue out -->
+  <path d="M80,120 Q100,132 120,120" stroke="#3A3A3A" stroke-width="3" fill="none" stroke-linecap="round"/>
+  <ellipse cx="100" cy="135" rx="12" ry="15" fill="#E53935"/>
+  <line x1="100" y1="125" x2="100" y2="148" stroke="#C62828" stroke-width="1.5"/>
+  <!-- Cheeks -->
+  <circle cx="60" cy="105" r="8" fill="#FFB6C1" opacity="0.4"/>
+  <circle cx="140" cy="105" r="8" fill="#FFB6C1" opacity="0.4"/>
+</svg>

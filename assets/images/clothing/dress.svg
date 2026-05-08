@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">
+  <!-- Dress body -->
+  <path d="M75,55 L60,170 Q60,180 100,180 Q140,180 140,170 L125,55 Z" fill="#EC407A" stroke="#C2185B" stroke-width="2"/>
+  <!-- Top/bodice -->
+  <path d="M75,55 Q100,50 125,55 L125,85 L75,85 Z" fill="#EC407A" stroke="#C2185B" stroke-width="2"/>
+  <!-- Straps -->
+  <path d="M80,55 L85,35" stroke="#C2185B" stroke-width="4" stroke-linecap="round"/>
+  <path d="M120,55 L115,35" stroke="#C2185B" stroke-width="4" stroke-linecap="round"/>
+  <!-- Waist ribbon -->
+  <rect x="68" y="83" width="64" height="8" fill="#FFF176" rx="4"/>
+  <!-- Bow -->
+  <ellipse cx="100" cy="87" rx="10" ry="6" fill="#FFF176" stroke="#FBC02D" stroke-width="1"/>
+  <circle cx="100" cy="87" r="3" fill="#FBC02D"/>
+  <!-- Polka dots -->
+  <circle cx="85" cy="110" r="4" fill="#F8BBD0"/>
+  <circle cx="105" cy="130" r="4" fill="#F8BBD0"/>
+  <circle cx="90" cy="155" r="4" fill="#F8BBD0"/>
+  <circle cx="115" cy="155" r="4" fill="#F8BBD0"/>
+  <circle cx="115" cy="105" r="4" fill="#F8BBD0"/>
+</svg>

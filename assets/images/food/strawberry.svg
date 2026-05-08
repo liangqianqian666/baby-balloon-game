@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">
+  <!-- Leaves -->
+  <ellipse cx="80" cy="48" rx="15" ry="8" fill="#4CAF50" transform="rotate(-30 80 48)"/>
+  <ellipse cx="120" cy="48" rx="15" ry="8" fill="#4CAF50" transform="rotate(30 120 48)"/>
+  <ellipse cx="100" cy="42" rx="12" ry="8" fill="#4CAF50"/>
+  <!-- Berry body -->
+  <path d="M55,60 Q50,100 65,140 Q80,170 100,175 Q120,170 135,140 Q150,100 145,60Z" fill="#FF4757"/>
+  <!-- Seeds -->
+  <ellipse cx="80" cy="90" rx="2" ry="3" fill="#FFD93D"/>
+  <ellipse cx="100" cy="85" rx="2" ry="3" fill="#FFD93D"/>
+  <ellipse cx="120" cy="90" rx="2" ry="3" fill="#FFD93D"/>
+  <ellipse cx="85" cy="120" rx="2" ry="3" fill="#FFD93D"/>
+  <ellipse cx="115" cy="120" rx="2" ry="3" fill="#FFD93D"/>
+  <ellipse cx="100" cy="145" rx="2" ry="3" fill="#FFD93D"/>
+  <!-- Eyes -->
+  <circle cx="85" cy="100" r="6" fill="#3A3A3A"/>
+  <circle cx="115" cy="100" r="6" fill="#3A3A3A"/>
+  <circle cx="87" cy="98" r="2.5" fill="white"/>
+  <circle cx="117" cy="98" r="2.5" fill="white"/>
+  <!-- Cheeks -->
+  <circle cx="72" cy="112" r="8" fill="#FF8FAB" opacity="0.4"/>
+  <circle cx="128" cy="112" r="8" fill="#FF8FAB" opacity="0.4"/>
+  <!-- Mouth -->
+  <path d="M92,118 Q100,126 108,118" stroke="#3A3A3A" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+</svg>
