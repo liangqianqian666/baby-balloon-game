@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">
+  <!-- Steps -->
+  <rect x="30" y="150" width="150" height="15" rx="3" fill="#D4915E"/>
+  <rect x="45" y="130" width="135" height="15" rx="3" fill="#E8A833"/>
+  <rect x="60" y="110" width="120" height="15" rx="3" fill="#D4915E"/>
+  <rect x="75" y="90" width="105" height="15" rx="3" fill="#E8A833"/>
+  <rect x="90" y="70" width="90" height="15" rx="3" fill="#D4915E"/>
+  <rect x="105" y="50" width="75" height="15" rx="3" fill="#E8A833"/>
+  <!-- Railing -->
+  <line x1="175" y1="40" x2="175" y2="165" stroke="#8B5E3C" stroke-width="5" stroke-linecap="round"/>
+  <circle cx="175" cy="38" r="6" fill="#8B5E3C"/>
+  <!-- Eyes on middle step -->
+  <circle cx="100" cy="116" r="4" fill="#3A3A3A"/>
+  <circle cx="115" cy="116" r="4" fill="#3A3A3A"/>
+  <circle cx="101" cy="115" r="1.5" fill="white"/>
+  <circle cx="116" cy="115" r="1.5" fill="white"/>
+  <!-- Mouth -->
+  <path d="M103,122 Q108,126 113,122" stroke="#3A3A3A" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+</svg>

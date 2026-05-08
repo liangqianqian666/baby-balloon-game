@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">
+  <!-- Bowl -->
+  <ellipse cx="100" cy="140" rx="65" ry="20" fill="#87CEEB"/>
+  <path d="M35,120 Q35,160 100,165 Q165,160 165,120Z" fill="#87CEEB"/>
+  <ellipse cx="100" cy="120" rx="65" ry="22" fill="#B0E0E6"/>
+  <!-- Cereal pieces -->
+  <circle cx="70" cy="110" r="8" fill="#FFD93D"/>
+  <circle cx="90" cy="105" r="8" fill="#F0C419"/>
+  <circle cx="110" cy="108" r="8" fill="#FFD93D"/>
+  <circle cx="130" cy="112" r="8" fill="#F0C419"/>
+  <circle cx="80" cy="118" r="7" fill="#FFD93D"/>
+  <circle cx="100" cy="115" r="8" fill="#F0C419"/>
+  <circle cx="120" cy="118" r="7" fill="#FFD93D"/>
+  <!-- Milk splash -->
+  <ellipse cx="100" cy="115" rx="50" ry="10" fill="white" opacity="0.4"/>
+  <!-- Eyes -->
+  <circle cx="85" cy="108" r="4" fill="#3A3A3A"/>
+  <circle cx="115" cy="108" r="4" fill="#3A3A3A"/>
+  <circle cx="86" cy="107" r="1.5" fill="white"/>
+  <circle cx="116" cy="107" r="1.5" fill="white"/>
+  <!-- Mouth -->
+  <path d="M93,120 Q100,126 107,120" stroke="#3A3A3A" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+</svg>

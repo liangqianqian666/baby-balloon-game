@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">
+  <!-- Pizza slice -->
+  <path d="M100,30 L40,170 L160,170Z" fill="#FFD93D" stroke="#E6B800" stroke-width="2"/>
+  <!-- Crust -->
+  <path d="M40,170 Q100,185 160,170" stroke="#D4915E" stroke-width="12" fill="none" stroke-linecap="round"/>
+  <!-- Sauce -->
+  <path d="M100,50 L55,155 L145,155Z" fill="#FF6B6B" opacity="0.6"/>
+  <!-- Pepperoni -->
+  <circle cx="90" cy="110" r="10" fill="#D32F2F"/>
+  <circle cx="115" cy="130" r="9" fill="#D32F2F"/>
+  <circle cx="100" cy="80" r="8" fill="#D32F2F"/>
+  <!-- Eyes -->
+  <circle cx="85" cy="125" r="5" fill="#3A3A3A"/>
+  <circle cx="115" cy="125" r="5" fill="#3A3A3A"/>
+  <circle cx="87" cy="123" r="2" fill="white"/>
+  <circle cx="117" cy="123" r="2" fill="white"/>
+  <!-- Cheeks -->
+  <circle cx="72" cy="138" r="7" fill="#FFB6C1" opacity="0.4"/>
+  <circle cx="128" cy="138" r="7" fill="#FFB6C1" opacity="0.4"/>
+  <!-- Mouth -->
+  <path d="M93,142 Q100,150 107,142" stroke="#3A3A3A" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+</svg>

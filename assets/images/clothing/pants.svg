@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">
+  <!-- Pants body -->
+  <path d="M55,35 L55,45 L145,45 L145,35 Q145,30 140,30 L60,30 Q55,30 55,35 Z" fill="#1976D2"/>
+  <!-- Waistband -->
+  <rect x="55" y="30" width="90" height="18" fill="#1565C0" rx="3"/>
+  <!-- Left leg -->
+  <path d="M55,48 L55,170 Q55,175 60,175 L95,175 Q100,175 100,170 L100,48" fill="#1976D2" stroke="#1565C0" stroke-width="1.5"/>
+  <!-- Right leg -->
+  <path d="M100,48 L100,170 Q100,175 105,175 L140,175 Q145,175 145,170 L145,48" fill="#1976D2" stroke="#1565C0" stroke-width="1.5"/>
+  <!-- Button -->
+  <circle cx="100" cy="38" r="4" fill="#FFA000"/>
+  <!-- Pockets -->
+  <path d="M60,55 L60,80 L80,80 L80,55" fill="none" stroke="#1565C0" stroke-width="2" stroke-linecap="round"/>
+  <path d="M120,55 L120,80 L140,80 L140,55" fill="none" stroke="#1565C0" stroke-width="2" stroke-linecap="round"/>
+</svg>

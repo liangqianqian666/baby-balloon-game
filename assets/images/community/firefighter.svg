@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">
+  <!-- Body -->
+  <rect x="60" y="110" width="80" height="70" rx="15" fill="#FFD93D"/>
+  <!-- Suspenders -->
+  <rect x="75" y="110" width="12" height="70" rx="3" fill="#D4915E"/>
+  <rect x="113" y="110" width="12" height="70" rx="3" fill="#D4915E"/>
+  <!-- Head -->
+  <circle cx="100" cy="80" r="35" fill="#FDEBD0"/>
+  <!-- Helmet -->
+  <path d="M65,75 Q65,40 100,35 Q135,40 135,75Z" fill="#FF4757"/>
+  <rect x="60" y="70" width="80" height="10" rx="3" fill="#FF6B6B"/>
+  <!-- Shield on helmet -->
+  <rect x="90" y="43" width="20" height="15" rx="3" fill="#FFD93D"/>
+  <!-- Eyes -->
+  <circle cx="85" cy="80" r="6" fill="#3A3A3A"/>
+  <circle cx="115" cy="80" r="6" fill="#3A3A3A"/>
+  <circle cx="87" cy="78" r="2.5" fill="white"/>
+  <circle cx="117" cy="78" r="2.5" fill="white"/>
+  <!-- Cheeks -->
+  <circle cx="72" cy="92" r="7" fill="#FFB6C1" opacity="0.45"/>
+  <circle cx="128" cy="92" r="7" fill="#FFB6C1" opacity="0.45"/>
+  <!-- Mouth -->
+  <path d="M92,97 Q100,104 108,97" stroke="#3A3A3A" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+  <!-- Axe -->
+  <rect x="145" y="90" width="5" height="70" rx="2" fill="#8B5E3C"/>
+  <rect x="140" y="85" width="20" height="15" rx="3" fill="#C0C0C0"/>
+</svg>

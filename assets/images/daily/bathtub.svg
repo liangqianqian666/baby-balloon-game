@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">
+  <!-- Tub body -->
+  <path d="M25,90 Q25,170 100,175 Q175,170 175,90Z" fill="white" stroke="#E0E0E0" stroke-width="2"/>
+  <!-- Rim -->
+  <ellipse cx="100" cy="90" rx="78" ry="15" fill="#E8E8E8"/>
+  <ellipse cx="100" cy="88" rx="75" ry="12" fill="white"/>
+  <!-- Water -->
+  <ellipse cx="100" cy="100" rx="65" ry="12" fill="#87CEEB" opacity="0.5"/>
+  <!-- Bubbles -->
+  <circle cx="60" cy="80" r="12" fill="white" stroke="#E0E0E0" stroke-width="1"/>
+  <circle cx="80" cy="72" r="10" fill="white" stroke="#E0E0E0" stroke-width="1"/>
+  <circle cx="95" cy="78" r="8" fill="white" stroke="#E0E0E0" stroke-width="1"/>
+  <circle cx="120" cy="74" r="11" fill="white" stroke="#E0E0E0" stroke-width="1"/>
+  <circle cx="140" cy="80" r="9" fill="white" stroke="#E0E0E0" stroke-width="1"/>
+  <!-- Faucet -->
+  <rect x="155" y="55" width="12" height="30" rx="4" fill="#C0C0C0"/>
+  <rect x="145" y="52" width="25" height="8" rx="4" fill="#C0C0C0"/>
+  <!-- Feet -->
+  <ellipse cx="40" cy="175" rx="10" ry="6" fill="#C0C0C0"/>
+  <ellipse cx="160" cy="175" rx="10" ry="6" fill="#C0C0C0"/>
+  <!-- Eyes in bubbles -->
+  <circle cx="80" cy="85" r="4" fill="#3A3A3A"/>
+  <circle cx="100" cy="85" r="4" fill="#3A3A3A"/>
+  <circle cx="81" cy="84" r="1.5" fill="white"/>
+  <circle cx="101" cy="84" r="1.5" fill="white"/>
+  <!-- Mouth -->
+  <path d="M85,93 Q90,98 95,93" stroke="#3A3A3A" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+</svg>

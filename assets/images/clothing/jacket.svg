@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">
+  <!-- Jacket body -->
+  <rect x="50" y="65" width="100" height="110" fill="#FF7043" rx="8"/>
+  <!-- Collar -->
+  <path d="M65,55 Q100,70 135,55 L140,70 L60,70 Z" fill="#E64A19"/>
+  <!-- Zipper -->
+  <line x1="100" y1="70" x2="100" y2="175" stroke="#FFA000" stroke-width="3"/>
+  <!-- Left sleeve -->
+  <path d="M50,70 L25,85 L25,140 Q25,145 30,145 L50,145 L50,70" fill="#FF7043" stroke="#E64A19" stroke-width="2"/>
+  <!-- Right sleeve -->
+  <path d="M150,70 L175,85 L175,140 Q175,145 170,145 L150,145 L150,70" fill="#FF7043" stroke="#E64A19" stroke-width="2"/>
+  <!-- Pockets -->
+  <rect x="60" y="120" width="30" height="25" fill="#E64A19" rx="3"/>
+  <rect x="110" y="120" width="30" height="25" fill="#E64A19" rx="3"/>
+</svg>

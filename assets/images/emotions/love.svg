@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">
+  <!-- Face -->
+  <circle cx="100" cy="100" r="70" fill="#F48FB1"/>
+  <!-- Heart eyes -->
+  <path d="M67,82 Q67,72 74,72 Q81,72 81,82 Q81,92 74,98 Q67,92 67,82" fill="#E53935"/>
+  <path d="M119,82 Q119,72 126,72 Q133,72 133,82 Q133,92 126,98 Q119,92 119,82" fill="#E53935"/>
+  <!-- Smile -->
+  <path d="M75,120 Q100,140 125,120" stroke="#3A3A3A" stroke-width="3" fill="none" stroke-linecap="round"/>
+  <!-- Cheeks -->
+  <circle cx="60" cy="112" r="8" fill="#E91E63" opacity="0.3"/>
+  <circle cx="140" cy="112" r="8" fill="#E91E63" opacity="0.3"/>
+  <!-- Little hearts floating -->
+  <path d="M145,50 Q145,45 148,45 Q151,45 151,50 Q151,55 148,57 Q145,55 145,50" fill="#E53935" opacity="0.6"/>
+  <path d="M155,65 Q155,62 157,62 Q159,62 159,65 Q159,68 157,69 Q155,68 155,65" fill="#E53935" opacity="0.4"/>
+</svg>

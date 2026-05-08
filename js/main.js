@@ -116,6 +116,7 @@ const LearningTracker = {
 window.addEventListener('DOMContentLoaded', () => {
   AudioManager.init();
   LearningTracker.init();
+  Analytics.init();
   showLevelSelect();
 });
 
@@ -183,6 +184,7 @@ async function startGame(levelKey) {
   }
 
   game.setLevel(levelKey);
+  Analytics.track('level_start', { level: levelKey });
 }
 
 // 通关后回到关卡选择

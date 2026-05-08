@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">
+  <!-- Hull -->
+  <path d="M20,120 Q30,160 100,165 Q170,160 180,120Z" fill="#FF6B6B"/>
+  <!-- Deck -->
+  <rect x="35" y="95" width="130" height="28" rx="8" fill="#FDEBD0"/>
+  <!-- Cabin -->
+  <rect x="65" y="55" width="50" height="42" rx="6" fill="white" stroke="#E0E0E0" stroke-width="1.5"/>
+  <!-- Cabin window -->
+  <circle cx="90" cy="75" r="10" fill="#87CEEB"/>
+  <!-- Chimney -->
+  <rect x="120" y="65" width="10" height="30" rx="3" fill="#FFD93D"/>
+  <!-- Smoke -->
+  <circle cx="125" cy="55" r="6" fill="#E0E0E0" opacity="0.5"/>
+  <circle cx="118" cy="48" r="5" fill="#E0E0E0" opacity="0.3"/>
+  <!-- Flag -->
+  <line x1="90" y1="55" x2="90" y2="30" stroke="#3A3A3A" stroke-width="2"/>
+  <polygon points="90,30 110,38 90,46" fill="#FF8FAB"/>
+  <!-- Water -->
+  <path d="M5,155 Q25,145 45,155 Q65,165 85,155 Q105,145 125,155 Q145,165 165,155 Q185,145 195,155" stroke="#87CEEB" stroke-width="3" fill="none"/>
+  <!-- Eyes -->
+  <circle cx="82" cy="73" r="4" fill="#3A3A3A"/>
+  <circle cx="98" cy="73" r="4" fill="#3A3A3A"/>
+  <circle cx="83" cy="72" r="1.5" fill="white"/>
+  <circle cx="99" cy="72" r="1.5" fill="white"/>
+</svg>

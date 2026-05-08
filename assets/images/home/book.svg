@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">
+  <!-- Book cover -->
+  <rect x="45" y="40" width="110" height="130" fill="#E53935" rx="5"/>
+  <!-- Pages side -->
+  <rect x="48" y="45" width="5" height="120" fill="#FFF9C4"/>
+  <!-- Spine -->
+  <rect x="45" y="40" width="10" height="130" fill="#C62828" rx="2"/>
+  <!-- Cover decoration -->
+  <rect x="65" y="55" width="75" height="8" fill="#FFCDD2" rx="3"/>
+  <rect x="65" y="70" width="55" height="6" fill="#FFCDD2" rx="3"/>
+  <!-- Star on cover -->
+  <polygon points="102,110 107,125 122,125 110,134 114,148 102,140 90,148 94,134 82,125 97,125" fill="#FFF176"/>
+</svg>

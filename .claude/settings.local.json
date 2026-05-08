@@ -16,7 +16,13 @@
       "Bash(gh api:*)",
       "Bash(git add:*)",
       "Bash(git commit:*)",
-      "Bash(git push:*)"
+      "Bash(git push:*)",
+      "Bash(wrangler login:*)",
+      "Bash(curl -sL \"https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/svg/1f9d1.svg\" -o head.svg)",
+      "Bash(curl -sL \"https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/svg/1f7e0.svg\" -o tummy.svg)",
+      "Bash(curl -sL \"https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/svg/1f9b7.svg\" -o teeth.svg)",
+      "Bash(curl -sL \"https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/svg/1f9b1.svg\" -o hair.svg)",
+      "Bash(node -c /Users/dev-0401/projects/baby-balloon-game/js/analytics.js)"
     ]
   }
 }

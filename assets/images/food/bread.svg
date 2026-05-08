@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">
+  <!-- Bread body -->
+  <ellipse cx="100" cy="120" rx="65" ry="45" fill="#F4C566"/>
+  <!-- Top crust -->
+  <ellipse cx="100" cy="85" rx="55" ry="30" fill="#E8A833"/>
+  <!-- Score lines -->
+  <path d="M70,80 Q85,70 100,80" stroke="#D4942A" stroke-width="2" fill="none" stroke-linecap="round"/>
+  <path d="M95,78 Q110,68 125,78" stroke="#D4942A" stroke-width="2" fill="none" stroke-linecap="round"/>
+  <!-- Eyes -->
+  <circle cx="82" cy="110" r="6" fill="#3A3A3A"/>
+  <circle cx="118" cy="110" r="6" fill="#3A3A3A"/>
+  <circle cx="84" cy="108" r="2.5" fill="white"/>
+  <circle cx="120" cy="108" r="2.5" fill="white"/>
+  <!-- Cheeks -->
+  <circle cx="68" cy="120" r="8" fill="#FFB6C1" opacity="0.4"/>
+  <circle cx="132" cy="120" r="8" fill="#FFB6C1" opacity="0.4"/>
+  <!-- Mouth -->
+  <path d="M92,128 Q100,135 108,128" stroke="#3A3A3A" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+</svg>

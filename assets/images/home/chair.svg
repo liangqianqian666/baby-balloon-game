@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">
+  <!-- Chair back -->
+  <rect x="55" y="40" width="90" height="70" fill="#FF8A65" rx="10"/>
+  <!-- Seat -->
+  <rect x="50" y="110" width="100" height="20" fill="#FF7043" rx="5"/>
+  <!-- Legs -->
+  <rect x="55" y="130" width="10" height="45" fill="#E64A19" rx="2"/>
+  <rect x="135" y="130" width="10" height="45" fill="#E64A19" rx="2"/>
+  <!-- Cushion -->
+  <ellipse cx="100" cy="105" rx="30" ry="10" fill="#FFAB91"/>
+</svg>

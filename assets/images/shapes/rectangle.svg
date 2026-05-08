@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">
+  <rect x="20" y="45" width="160" height="110" rx="8" fill="#87CEEB" stroke="#6BB3D9" stroke-width="3"/>
+  <!-- Eyes -->
+  <circle cx="80" cy="95" r="6" fill="#3A3A3A"/>
+  <circle cx="120" cy="95" r="6" fill="#3A3A3A"/>
+  <circle cx="82" cy="93" r="2.5" fill="white"/>
+  <circle cx="122" cy="93" r="2.5" fill="white"/>
+  <!-- Cheeks -->
+  <circle cx="62" cy="108" r="8" fill="#6BB3D9" opacity="0.3"/>
+  <circle cx="138" cy="108" r="8" fill="#6BB3D9" opacity="0.3"/>
+  <!-- Mouth -->
+  <path d="M92,115 Q100,123 108,115" stroke="#3A3A3A" stroke-width="2" fill="none" stroke-linecap="round"/>
+</svg>

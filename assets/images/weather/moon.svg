@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">
+  <!-- Crescent moon -->
+  <circle cx="100" cy="100" r="55" fill="#FFD54F"/>
+  <circle cx="125" cy="85" r="45" fill="#1A237E" opacity="0.9"/>
+  <!-- Face on visible part -->
+  <circle cx="78" cy="95" r="4" fill="#3A3A3A"/>
+  <circle cx="80" cy="93" r="1.5" fill="white"/>
+  <path d="M70,110 Q78,116 85,110" stroke="#3A3A3A" stroke-width="2" fill="none" stroke-linecap="round"/>
+  <!-- Cheek -->
+  <circle cx="65" cy="107" r="5" fill="#FF9800" opacity="0.3"/>
+  <!-- Stars -->
+  <circle cx="150" cy="50" r="3" fill="#FFF9C4"/>
+  <circle cx="160" cy="140" r="2.5" fill="#FFF9C4"/>
+  <circle cx="170" cy="90" r="2" fill="#FFF9C4"/>
+  <circle cx="140" cy="160" r="2" fill="#FFF9C4"/>
+</svg>

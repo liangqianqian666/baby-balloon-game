@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">
+  <!-- Candle -->
+  <rect x="96" y="30" width="8" height="25" rx="3" fill="#FF6B6B"/>
+  <ellipse cx="100" cy="28" rx="5" ry="7" fill="#FFD93D"/>
+  <ellipse cx="100" cy="25" rx="3" ry="4" fill="#FFA502"/>
+  <!-- Frosting -->
+  <path d="M40,80 Q55,60 70,80 Q85,60 100,80 Q115,60 130,80 Q145,60 160,80 L160,100 L40,100Z" fill="#FF8FAB"/>
+  <!-- Cake body -->
+  <rect x="40" y="80" width="120" height="80" rx="8" fill="#FDEBD0"/>
+  <!-- Frosting layer -->
+  <rect x="40" y="78" width="120" height="25" rx="5" fill="#FF8FAB"/>
+  <!-- Eyes -->
+  <circle cx="82" cy="125" r="6" fill="#3A3A3A"/>
+  <circle cx="118" cy="125" r="6" fill="#3A3A3A"/>
+  <circle cx="84" cy="123" r="2.5" fill="white"/>
+  <circle cx="120" cy="123" r="2.5" fill="white"/>
+  <!-- Cheeks -->
+  <circle cx="68" cy="135" r="8" fill="#FFB6C1" opacity="0.4"/>
+  <circle cx="132" cy="135" r="8" fill="#FFB6C1" opacity="0.4"/>
+  <!-- Mouth -->
+  <path d="M92,140 Q100,148 108,140" stroke="#3A3A3A" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+</svg>

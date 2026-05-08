@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">
+  <polygon points="100,20 185,80 155,170 45,170 15,80" fill="#FFD93D" stroke="#E6B800" stroke-width="3"/>
+  <!-- Eyes -->
+  <circle cx="80" cy="100" r="6" fill="#3A3A3A"/>
+  <circle cx="120" cy="100" r="6" fill="#3A3A3A"/>
+  <circle cx="82" cy="98" r="2.5" fill="white"/>
+  <circle cx="122" cy="98" r="2.5" fill="white"/>
+  <!-- Cheeks -->
+  <circle cx="62" cy="115" r="8" fill="#E6B800" opacity="0.3"/>
+  <circle cx="138" cy="115" r="8" fill="#E6B800" opacity="0.3"/>
+  <!-- Mouth -->
+  <path d="M92,120 Q100,128 108,120" stroke="#3A3A3A" stroke-width="2" fill="none" stroke-linecap="round"/>
+</svg>

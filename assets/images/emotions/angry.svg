@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">
+  <!-- Face -->
+  <circle cx="100" cy="100" r="70" fill="#EF5350"/>
+  <!-- Angry eyebrows -->
+  <path d="M60,70 L88,80" stroke="#3A3A3A" stroke-width="4" fill="none" stroke-linecap="round"/>
+  <path d="M140,70 L112,80" stroke="#3A3A3A" stroke-width="4" fill="none" stroke-linecap="round"/>
+  <!-- Eyes -->
+  <circle cx="78" cy="92" r="7" fill="#3A3A3A"/>
+  <circle cx="122" cy="92" r="7" fill="#3A3A3A"/>
+  <!-- Grumpy mouth -->
+  <path d="M75,130 Q100,118 125,130" stroke="#3A3A3A" stroke-width="3.5" fill="none" stroke-linecap="round"/>
+  <!-- Puff marks -->
+  <circle cx="55" cy="115" r="6" fill="#C62828" opacity="0.4"/>
+  <circle cx="145" cy="115" r="6" fill="#C62828" opacity="0.4"/>
+</svg>
