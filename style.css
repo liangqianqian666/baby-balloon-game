@@ -116,6 +116,35 @@ body {
   color: #555;
 }
 
+.level-complete {
+  position: absolute;
+  top: 4px;
+  right: 6px;
+  font-size: 14px;
+  color: #44CC44;
+  font-weight: bold;
+}
+
+.level-due {
+  position: absolute;
+  top: 4px;
+  right: 6px;
+  font-size: 11px;
+  background: #FF6B6B;
+  color: white;
+  border-radius: 50%;
+  width: 18px;
+  height: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+}
+
+.level-btn {
+  position: relative;
+}
+
 /* 游戏画布 */
 #game-canvas {
   display: block;

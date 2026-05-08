@@ -176,10 +176,10 @@ class Game {
     return -1;
   }
 
-  // 智能选 item（不熟的出现更多）
+  // 智能选 item（带生词/熟词配比）
   _pickNewItem() {
     const usedIds = this.balloons.filter(b => !b.popping).map(b => b.item.id);
-    return LearningTracker.pickWeightedItem(this.level._key, usedIds);
+    return SpacedRep.pickWeightedItem(this.levelKey, usedIds);
   }
 
   // 添加一个新气球
@@ -196,7 +196,7 @@ class Game {
   // 设置关卡并开始
   setLevel(levelKey) {
     this.level = LEVELS[levelKey];
-    this.level._key = levelKey;
+    this.levelKey = levelKey;
     this.levelItems = this.level.items;
     this.score = 0;
     this.streak = 0;
@@ -213,12 +213,12 @@ class Game {
     this.pickTarget();
   }
 
-  // 选一个新目标
+  // 选一个新目标（优先选生词/学习中的）
   pickTarget() {
     const aliveItems = this.balloons.filter(b => !b.popping).map(b => b.item);
     if (aliveItems.length === 0) return;
 
-    this.targetItem = aliveItems[Math.floor(Math.random() * aliveItems.length)];
+    this.targetItem = SpacedRep.pickTarget(this.levelKey, aliveItems);
     this.state = 'playing';
 
     const hint = document.getElementById('color-hint');
@@ -298,8 +298,8 @@ class Game {
     document.getElementById('color-hint').style.color = '#FFD700';
 
     // 记录学习数据
-    LearningTracker.record(this.level._key, balloon.item.id, true);
-    Analytics.track('correct', { level: this.level._key, item: balloon.item.id });
+    SpacedRep.record(this.levelKey, balloon.item.id, true);
+    Analytics.track('correct', { level: this.levelKey, item: balloon.item.id });
 
     // 立即说单词
     this.streak++;
@@ -345,8 +345,8 @@ class Game {
     if (balloon.shaking) return;
     balloon.shake();
     this.streak = 0;
-    LearningTracker.record(this.level._key, balloon.item.id, false);
-    Analytics.track('wrong', { level: this.level._key, item: balloon.item.id, target: this.targetItem.id });
+    LearningTracker.record(this.levelKey, balloon.item.id, false);
+    Analytics.track('wrong', { level: this.levelKey, item: balloon.item.id, target: this.targetItem.id });
     AudioManager.playWrong();
     const wrongText = this.level.wrongSay(balloon.item, this.targetItem);
     AudioManager.speakGeneric(wrongText);

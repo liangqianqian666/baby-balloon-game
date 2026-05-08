@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>家长面板 — 宝宝学习进度</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: -apple-system, 'PingFang SC', Arial, sans-serif; background: #f5f7fa; color: #333; padding: 20px; max-width: 1000px; margin: 0 auto; }
+  h1 { text-align: center; color: #333; margin-bottom: 6px; font-size: 24px; }
+  .subtitle { text-align: center; color: #888; font-size: 13px; margin-bottom: 24px; }
+
+  /* 总览卡片 */
+  .overview { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; margin-bottom: 30px; }
+  .card { background: white; border-radius: 12px; padding: 16px; text-align: center; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+  .card .num { font-size: 28px; font-weight: bold; color: #4488FF; }
+  .card .label { font-size: 12px; color: #888; margin-top: 4px; }
+  .card.warn .num { color: #FF6B6B; }
+  .card.good .num { color: #44CC44; }
+
+  /* 专题进度 */
+  .level-section { background: white; border-radius: 12px; padding: 16px; margin-bottom: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); cursor: pointer; }
+  .level-header { display: flex; align-items: center; gap: 10px; }
+  .level-header .icon { font-size: 28px; }
+  .level-header .name { font-weight: bold; font-size: 16px; flex: 1; }
+  .level-header .stats { font-size: 12px; color: #888; }
+  .progress-bar { height: 6px; border-radius: 3px; background: #eee; margin-top: 8px; overflow: hidden; display: flex; }
+  .progress-bar .mastered { background: #44CC44; }
+  .progress-bar .reviewing { background: #FFD700; }
+  .progress-bar .learning { background: #4488FF; }
+
+  /* 词汇详情 */
+  .level-detail { display: none; margin-top: 12px; padding-top: 12px; border-top: 1px solid #eee; }
+  .level-detail.open { display: block; }
+  .vocab-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: 10px; }
+  .vocab-item { text-align: center; padding: 8px; border-radius: 10px; background: #f9f9f9; position: relative; }
+  .vocab-item img { width: 50px; height: 50px; }
+  .vocab-item .emoji-display { font-size: 36px; line-height: 50px; }
+  .vocab-item .word { font-size: 12px; font-weight: bold; margin-top: 4px; }
+  .vocab-item .status-tag { position: absolute; top: 4px; right: 4px; font-size: 9px; padding: 1px 4px; border-radius: 4px; color: white; }
+  .status-new { background: #4488FF; }
+  .status-learning { background: #FF8833; }
+  .status-reviewing { background: #FFD700; color: #333; }
+  .status-mastered { background: #44CC44; }
+
+  /* 复习建议 */
+  .review-section { background: white; border-radius: 12px; padding: 16px; margin-top: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+  .review-section h2 { font-size: 16px; margin-bottom: 12px; color: #FF6B6B; }
+  .review-list { display: flex; flex-wrap: wrap; gap: 8px; }
+  .review-item { display: flex; align-items: center; gap: 6px; background: #FFF5F5; border: 1px solid #FFD4D4; border-radius: 8px; padding: 6px 10px; font-size: 13px; }
+  .review-item img { width: 24px; height: 24px; }
+  .review-item .retention { font-size: 10px; color: #FF6B6B; }
+  .empty-msg { color: #888; font-size: 13px; }
+
+  /* 返回按钮 */
+  .back-btn { display: block; margin: 20px auto; padding: 10px 30px; background: #4488FF; color: white; border: none; border-radius: 8px; font-size: 14px; cursor: pointer; }
+</style>
+</head>
+<body>
+  <h1>📊 宝宝学习进度</h1>
+  <p class="subtitle">数据存储在本设备浏览器中</p>
+
+  <div class="overview" id="overview"></div>
+
+  <div id="levels-container"></div>
+
+  <div class="review-section" id="review-section">
+    <h2>⏰ 需要复习的词汇</h2>
+    <div class="review-list" id="review-list"></div>
+  </div>
+
+  <button class="back-btn" onclick="location.href='index.html'">← 返回游戏</button>
+
+  <script src="js/config.js?v=5"></script>
+  <script src="js/levels.js?v=5"></script>
+  <script src="js/spaced-rep.js?v=5"></script>
+  <script src="js/analytics.js?v=5"></script>
+  <script>
+    SpacedRep.init();
+
+    // 总览
+    const allProgress = SpacedRep.getAllProgress();
+    let totalWords = 0, totalMastered = 0, totalLearning = 0, totalDue = 0;
+    Object.values(allProgress).forEach(p => {
+      totalWords += p.total;
+      totalMastered += p.mastered;
+      totalLearning += p.learning + p.reviewing;
+      totalDue += p.reviewDue;
+    });
+
+    // 学习时间
+    const summary = Analytics.getSummary();
+
+    document.getElementById('overview').innerHTML = `
+      <div class="card"><div class="num">${totalWords}</div><div class="label">总词汇量</div></div>
+      <div class="card good"><div class="num">${totalMastered}</div><div class="label">已掌握</div></div>
+      <div class="card"><div class="num">${totalLearning}</div><div class="label">学习中</div></div>
+      <div class="card warn"><div class="num">${totalDue}</div><div class="label">待复习</div></div>
+      <div class="card"><div class="num">${summary.totalDurationMin}m</div><div class="label">总学习时间</div></div>
+    `;
+
+    // 各专题
+    const container = document.getElementById('levels-container');
+    Object.keys(LEVELS).forEach(key => {
+      const level = LEVELS[key];
+      const progress = allProgress[key];
+      const pctMastered = (progress.mastered / progress.total * 100).toFixed(0);
+      const pctReviewing = (progress.reviewing / progress.total * 100).toFixed(0);
+      const pctLearning = (progress.learning / progress.total * 100).toFixed(0);
+
+      const section = document.createElement('div');
+      section.className = 'level-section';
+      section.innerHTML = `
+        <div class="level-header">
+          <span class="icon">${level.icon}</span>
+          <span class="name">${level.name}</span>
+          <span class="stats">${progress.mastered}/${progress.total} 掌握</span>
+        </div>
+        <div class="progress-bar">
+          <div class="mastered" style="width:${pctMastered}%"></div>
+          <div class="reviewing" style="width:${pctReviewing}%"></div>
+          <div class="learning" style="width:${pctLearning}%"></div>
+        </div>
+        <div class="level-detail">
+          <div class="vocab-grid">
+            ${level.items.map(item => {
+              const status = SpacedRep.getItemStatus(key, item.id);
+              const statusLabel = { new: '新', learning: '学', reviewing: '复', mastered: '✓' }[status];
+              let imgHtml = '';
+              if (item.display && item.display.startsWith('assets/')) {
+                imgHtml = `<img src="${item.display}" alt="${item.id}">`;
+              } else if (item.display) {
+                imgHtml = `<span class="emoji-display">${item.display}</span>`;
+              } else {
+                imgHtml = `<span class="emoji-display" style="background:${item.color};width:36px;height:36px;border-radius:50%;display:inline-block"></span>`;
+              }
+              return `<div class="vocab-item">
+                <span class="status-tag status-${status}">${statusLabel}</span>
+                ${imgHtml}
+                <div class="word">${item.label}</div>
+              </div>`;
+            }).join('')}
+          </div>
+        </div>
+      `;
+      section.querySelector('.level-header').onclick = () => {
+        section.querySelector('.level-detail').classList.toggle('open');
+      };
+      container.appendChild(section);
+    });
+
+    // 需要复习的词
+    const reviewList = document.getElementById('review-list');
+    let allDueItems = [];
+    Object.keys(LEVELS).forEach(key => {
+      const dueItems = SpacedRep.getDueItems(key);
+      dueItems.forEach(item => allDueItems.push({ ...item, levelKey: key, levelName: LEVELS[key].name }));
+    });
+    allDueItems.sort((a, b) => a.retention - b.retention);
+
+    if (allDueItems.length === 0) {
+      reviewList.innerHTML = '<span class="empty-msg">暂无需要复习的词汇 🎉</span>';
+    } else {
+      reviewList.innerHTML = allDueItems.slice(0, 30).map(item => {
+        let img = '';
+        if (item.display && item.display.startsWith('assets/')) {
+          img = `<img src="${item.display}">`;
+        }
+        const retPct = (item.retention * 100).toFixed(0);
+        return `<div class="review-item">${img}<span>${item.label}</span><span class="retention">${retPct}%</span></div>`;
+      }).join('');
+    }
+  </script>
+</body>
+</html>
