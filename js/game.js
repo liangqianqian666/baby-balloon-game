@@ -330,7 +330,6 @@ class Game {
 
   _showChineseHint() {
     const hint = document.getElementById('color-hint');
-    // 在英文下方加中文小提示
     const cnMap = {
       red:'红色', blue:'蓝色', yellow:'黄色', green:'绿色', purple:'紫色',
       orange:'橙色', pink:'粉色', white:'白色', black:'黑色', brown:'棕色',
@@ -352,11 +351,14 @@ class Game {
       happy:'开心', sad:'伤心', angry:'生气', surprised:'惊讶',
       scared:'害怕', sleepy:'困了', silly:'傻傻的', love:'爱',
     };
-    const cn = cnMap[this.targetItem.id];
+    const en = this.targetItem.id;
+    const cn = cnMap[en];
     if (cn) {
-      hint.innerHTML = `${this.targetItem.label}<br><span style="font-size:32px;color:#555">找${cn}的！👆</span>`;
+      hint.innerHTML = `${this.targetItem.label}<br><span style="font-size:28px;color:#555">小朋友，${en} 就是${cn}哦！找找看 👆</span>`;
+      AudioManager.speakGeneric(`${en}! Find the ${en}!`);
     } else {
-      hint.innerHTML = `${this.targetItem.label}<br><span style="font-size:32px;color:#555">找这个！👆</span>`;
+      hint.innerHTML = `${this.targetItem.label}<br><span style="font-size:28px;color:#555">找这个！👆</span>`;
+      AudioManager.speakGeneric(`Find the ${en}!`);
     }
   }
 
