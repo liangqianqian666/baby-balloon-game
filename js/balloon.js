@@ -46,6 +46,7 @@ class Balloon {
     this.breathSpeed = 0.03 + Math.random() * 0.01;
     this.slot = 0;
     this.fadeIn = 0;
+    this.immunity = 60;       // 新气球保护期：~1秒内不可被触碰
     this.dwellTime = 0;      // 手停留在气球上的帧数
     this.dwellThreshold = 12; // 需要停留约 200ms（~12帧@60fps）才算触碰
 
@@ -84,6 +85,8 @@ class Balloon {
       this.shakeTime++;
       if (this.shakeTime > 20) this.shaking = false;
     }
+
+    if (this.immunity > 0) this.immunity--;
 
     // 原地轻轻跳动/晃动（不上飘）
     this.x = this.homeX + Math.sin(time * this.wobbleSpeedX + this.wobbleOffset) * this.wobbleAmountX;
