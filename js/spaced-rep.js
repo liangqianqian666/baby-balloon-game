@@ -3,9 +3,14 @@
 const SpacedRep = {
   _data: {},  // { [levelKey]: { [itemId]: { correct, wrong, lastSeen, streak } } }
 
+  _storageKey() {
+    return 'balloon-learning-data-' + (CONFIG.currentProfile || 'default');
+  },
+
   init() {
+    this._data = {};
     try {
-      const saved = localStorage.getItem('balloon-learning-data');
+      const saved = localStorage.getItem(this._storageKey());
       if (saved) this._data = JSON.parse(saved);
     } catch (e) {}
   },
@@ -30,7 +35,7 @@ const SpacedRep = {
 
   _save() {
     try {
-      localStorage.setItem('balloon-learning-data', JSON.stringify(this._data));
+      localStorage.setItem(this._storageKey(), JSON.stringify(this._data));
     } catch (e) {}
   },
 

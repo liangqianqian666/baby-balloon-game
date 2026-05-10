@@ -5,6 +5,10 @@ const Analytics = {
   _startTime: null,
   _events: [],
 
+  _analyticsKey() {
+    return 'balloon-analytics-' + (CONFIG.currentProfile || 'default');
+  },
+
   init() {
     this._sessionId = 'sess_' + Date.now() + '_' + Math.random().toString(36).slice(2, 8);
     this._startTime = Date.now();
@@ -49,7 +53,7 @@ const Analytics = {
     // 保存到历史记录
     let history = [];
     try {
-      history = JSON.parse(localStorage.getItem('balloon-analytics') || '[]');
+      history = JSON.parse(localStorage.getItem(this._analyticsKey()) || '[]');
     } catch (e) {}
 
     // 更新或添加当前会话
@@ -64,7 +68,7 @@ const Analytics = {
     if (history.length > 100) history = history.slice(-100);
 
     try {
-      localStorage.setItem('balloon-analytics', JSON.stringify(history));
+      localStorage.setItem(this._analyticsKey(), JSON.stringify(history));
     } catch (e) {}
   },
 
@@ -72,7 +76,7 @@ const Analytics = {
   getSummary() {
     let history = [];
     try {
-      history = JSON.parse(localStorage.getItem('balloon-analytics') || '[]');
+      history = JSON.parse(localStorage.getItem(this._analyticsKey()) || '[]');
     } catch (e) {}
 
     const uniqueUsers = [...new Set(history.map(s => s.userId))];

@@ -1,46 +1,44 @@
-// hand-cursor.js — 手掌光标，跟随手腕坐标
+// hand-cursor.js — 手掌光标，跟随 MediaPipe Hands 重心
 
 class HandCursor {
   constructor() {
     this.leftHand = { x: -100, y: -100, visible: false };
     this.rightHand = { x: -100, y: -100, visible: false };
-    this.smoothing = 0.4; // 平滑系数，越小越平滑
-    this.trail = []; // 轨迹拖尾
+    this.smoothing = 0.4;
   }
 
-  // 从 MoveNet 关键点更新位置
-  // keypoints: MoveNet 17 个关键点
-  // videoW/H: 视频尺寸, canvasW/H: 画布尺寸
-  update(keypoints, videoW, videoH, canvasW, canvasH) {
-    if (!keypoints || keypoints.length < 17) return;
-
-    // MoveNet 关键点索引: 9=left_wrist, 10=right_wrist
-    const leftWrist = keypoints[9];
-    const rightWrist = keypoints[10];
-
-    const minConfidence = 0.3;
-
-    // 左手（摄像头镜像，所以 MoveNet 的 left 对应屏幕的 right 方向，需要翻转）
-    if (leftWrist && leftWrist.score > minConfidence) {
-      // 镜像翻转 x 坐标
-      const targetX = (1 - leftWrist.x / videoW) * canvasW;
-      const targetY = (leftWrist.y / videoH) * canvasH;
-      this.leftHand.x += (targetX - this.leftHand.x) * this.smoothing;
-      this.leftHand.y += (targetY - this.leftHand.y) * this.smoothing;
-      this.leftHand.visible = true;
-    } else {
+  // 从 MediaPipe Hands landmarks 更新位置
+  // handsLandmarks: 数组，每个元素是 21 个 {x, y, z}（归一化 0~1）
+  // canvasW/H: 画布尺寸
+  update(handsLandmarks, canvasW, canvasH) {
+    if (!handsLandmarks || handsLandmarks.length === 0) {
       this.leftHand.visible = false;
+      this.rightHand.visible = false;
+      return;
     }
 
-    // 右手
-    if (rightWrist && rightWrist.score > minConfidence) {
-      const targetX = (1 - rightWrist.x / videoW) * canvasW;
-      const targetY = (rightWrist.y / videoH) * canvasH;
-      this.rightHand.x += (targetX - this.rightHand.x) * this.smoothing;
-      this.rightHand.y += (targetY - this.rightHand.y) * this.smoothing;
-      this.rightHand.visible = true;
-    } else {
-      this.rightHand.visible = false;
+    // 处理每只手（最多2只）
+    const hands = [this.leftHand, this.rightHand];
+    for (let i = 0; i < 2; i++) {
+      const hand = hands[i];
+      if (i < handsLandmarks.length) {
+        const landmarks = handsLandmarks[i];
+        // 计算 21 个 landmark 的重心
+        let sumX = 0, sumY = 0;
+        for (const lm of landmarks) {
+          sumX += lm.x;
+          sumY += lm.y;
+        }
+        // landmarks 是归一化坐标 (0~1)，镜像翻转 x
+        const targetX = (1 - sumX / landmarks.length) * canvasW;
+        const targetY = (sumY / landmarks.length) * canvasH;
+
+        hand.x += (targetX - hand.x) * this.smoothing;
+        hand.y += (targetY - hand.y) * this.smoothing;
+        hand.visible = true;
+      } else {
+        hand.visible = false;
+      }
     }
   }
 
@@ -69,7 +67,7 @@ class HandCursor {
       ctx.font = '30px serif';
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
-      ctx.fillText('⭐', hand.x, hand.y);
+      ctx.fillText('\u2b50', hand.x, hand.y);
 
       ctx.restore();
     };
@@ -77,7 +75,6 @@ class HandCursor {
     drawHand(this.rightHand);
   }
 
-  // 返回所有可见手的位置
   getActivePositions() {
     const positions = [];
     if (this.leftHand.visible) positions.push(this.leftHand);
