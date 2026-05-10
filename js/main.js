@@ -78,23 +78,40 @@ function showLevelSelect() {
   const container = document.getElementById('level-buttons');
   container.innerHTML = '';
 
-  Object.keys(LEVELS).forEach(key => {
-    const level = LEVELS[key];
-    const progress = SpacedRep.getLevelProgress(key);
-    const btn = document.createElement('button');
-    btn.className = 'level-btn';
+  LEVEL_CATEGORIES.forEach(cat => {
+    // 过滤出存在的关卡
+    const validKeys = cat.levels.filter(k => LEVELS[k]);
+    if (validKeys.length === 0) return;
 
-    // 进度指示器
-    let progressDot = '';
-    if (progress && progress.mastered === progress.total) {
-      progressDot = '<span class="level-complete">✓</span>';
-    } else if (progress && progress.reviewDue > 0) {
-      progressDot = `<span class="level-due" title="${progress.reviewDue}个词需要复习">复习${progress.reviewDue}</span>`;
-    }
+    // 分类标题
+    const header = document.createElement('div');
+    header.className = 'level-category-header';
+    header.innerHTML = `<span class="cat-name">${cat.name}</span><span class="cat-desc">${cat.description}</span>`;
+    container.appendChild(header);
 
-    btn.innerHTML = `<span class="level-icon">${level.icon}</span><span class="level-name">${level.name}</span>${progressDot}`;
-    btn.onclick = () => startGame(key);
-    container.appendChild(btn);
+    // 关卡按钮网格
+    const grid = document.createElement('div');
+    grid.className = 'level-grid';
+
+    validKeys.forEach(key => {
+      const level = LEVELS[key];
+      const progress = SpacedRep.getLevelProgress(key);
+      const btn = document.createElement('button');
+      btn.className = 'level-btn';
+
+      let progressDot = '';
+      if (progress && progress.mastered === progress.total) {
+        progressDot = '<span class="level-complete">✓</span>';
+      } else if (progress && progress.reviewDue > 0) {
+        progressDot = `<span class="level-due" title="${progress.reviewDue}个词需要复习">复习${progress.reviewDue}</span>`;
+      }
+
+      btn.innerHTML = `<span class="level-icon">${level.icon}</span><span class="level-name">${level.name}</span>${progressDot}`;
+      btn.onclick = () => startGame(key);
+      grid.appendChild(btn);
+    });
+
+    container.appendChild(grid);
   });
 }
 

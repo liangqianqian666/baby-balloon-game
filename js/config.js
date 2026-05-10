@@ -36,5 +36,5 @@ const CONFIG = {
   backgroundMode: 'none',
 
   // 图片风格: 'svg' = 手绘SVG, 'photo' = 实物照片
-  imageStyle: 'svg',
+  imageStyle: 'photo',
 };

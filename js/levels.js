@@ -321,3 +321,17 @@ const LEVELS = {
     wrongSay: (item, target) => `That's a ${item.id}. Find the ${target.id}!`,
   },
 };
+
+// 关卡分类
+const LEVEL_CATEGORIES = [
+  {
+    name: '📚 Basic',
+    description: 'Find the right one!',
+    levels: ['colors', 'numbers', 'numbers2', 'shapes', 'animals', 'fruits', 'vegetables', 'food', 'body', 'vehicles', 'clothing', 'weather', 'emotions', 'community', 'daily', 'home'],
+  },
+  // {
+  //   name: '🎮 Special',
+  //   description: 'Fun gameplay!',
+  //   levels: ['juice_bar'],  // 待实现
+  // },
+];
