@@ -238,3 +238,4 @@ const AudioManager = {
       osc.stop(start + 0.4);
     });
   }
+};
