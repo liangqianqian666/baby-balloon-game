@@ -14,6 +14,15 @@ class Game {
     this.balloonCount = 4;
     this.streak = 0;
 
+    // 正向刺激特效
+    this.flyingStars = [];    // 飞向计分板的星星
+    this.screenFlash = 0;     // 屏幕闪光 (0~1)
+    this.screenFlashColor = '#FFD700';
+    this.comboText = '';      // 连击文字
+    this.comboTextTimer = 0;
+    this.ripples = [];        // 彩虹波纹
+    this.starRain = [];       // 星星雨
+
     // 关卡
     this.level = null;
     this.levelItems = [];
@@ -255,6 +264,29 @@ class Game {
     });
     this.confetti = this.confetti.filter(c => c.life > 0);
 
+    // 更新飞行星星
+    this.flyingStars.forEach(s => {
+      s.x += (s.tx - s.x) * 0.08;
+      s.y += (s.ty - s.y) * 0.08;
+      s.life -= 0.015;
+      s.scale = 0.5 + Math.sin(s.life * Math.PI) * 0.5;
+    });
+    this.flyingStars = this.flyingStars.filter(s => s.life > 0);
+
+    // 更新屏幕闪光
+    if (this.screenFlash > 0) this.screenFlash *= 0.92;
+
+    // 更新连击文字
+    if (this.comboTextTimer > 0) this.comboTextTimer--;
+
+    // 更新彩虹波纹
+    this.ripples.forEach(r => { r.radius += 6; r.life -= 0.02; });
+    this.ripples = this.ripples.filter(r => r.life > 0);
+
+    // 更新星星雨
+    this.starRain.forEach(s => { s.y += s.vy; s.x += s.vx; s.vy += 0.08; s.rotation += 0.05; s.life -= 0.008; });
+    this.starRain = this.starRain.filter(s => s.life > 0);
+
     // 碰撞检测
     if (this.state === 'playing') {
       const hands = this.handCursor.getActivePositions();
@@ -296,6 +328,7 @@ class Game {
 
     // 立即说单词
     this.streak++;
+    this._triggerStreakEffects(balloon.x, balloon.y);
     const word = this.level.correctSay(balloon.item);
     AudioManager.speakColor(word, () => {
       AudioManager.speakPraise(this.streak, () => {
@@ -374,6 +407,158 @@ class Game {
     ctx.fill();
   }
 
+  // === 正向刺激特效 ===
+
+  _triggerStreakEffects(x, y) {
+    // 每次答对：飞星到计分板
+    this._spawnFlyingStar(x, y);
+
+    // 连对3个：大撒花 + 金色闪光 + combo文字
+    if (this.streak >= 3 && this.streak % 3 === 0) {
+      this.screenFlash = 0.4;
+      this.screenFlashColor = '#FFD700';
+      AudioManager.playStreakBonus();
+      for (let i = 0; i < 3; i++) {
+        setTimeout(() => {
+          this.spawnConfetti(
+            x + (Math.random() - 0.5) * 200,
+            y + (Math.random() - 0.5) * 100
+          );
+        }, i * 100);
+      }
+    }
+
+    // 连对5个：彩虹波纹 + 星星雨
+    if (this.streak >= 5 && this.streak % 5 === 0) {
+      this._spawnRipples(x, y);
+      this._spawnStarRain();
+      this.screenFlash = 0.6;
+      this.screenFlashColor = '#FF6BB5';
+    }
+
+    // 连击提示文字
+    if (this.streak >= 2) {
+      const combos = ['Combo!', 'Wow!', 'Cool!', 'Yeah!', 'Go go go!'];
+      this.comboText = this.streak >= 5
+        ? `🌟 ${this.streak}x ${combos[Math.floor(Math.random() * combos.length)]} 🌟`
+        : `⭐ ${this.streak}x ${combos[Math.floor(Math.random() * combos.length)]}`;
+      this.comboTextTimer = 60; // ~1秒
+    }
+  }
+
+  _spawnFlyingStar(x, y) {
+    // 飞向左上角计分板
+    for (let i = 0; i < 3; i++) {
+      this.flyingStars.push({
+        x: x + (Math.random() - 0.5) * 40,
+        y: y + (Math.random() - 0.5) * 40,
+        tx: 60, ty: 40, // 计分板位置
+        life: 1,
+        scale: 1,
+        size: 16 + Math.random() * 10,
+      });
+    }
+  }
+
+  _spawnRipples(x, y) {
+    const colors = ['#FF6B6B', '#FFD93D', '#6BCB77', '#4D96FF', '#FF6BB5', '#C9B1FF'];
+    for (let i = 0; i < 4; i++) {
+      setTimeout(() => {
+        this.ripples.push({
+          x, y,
+          radius: 10,
+          life: 1,
+          color: colors[i % colors.length],
+          lineWidth: 4 + i * 2,
+        });
+      }, i * 80);
+    }
+  }
+
+  _spawnStarRain() {
+    const w = this.canvas.width;
+    for (let i = 0; i < 20; i++) {
+      this.starRain.push({
+        x: Math.random() * w,
+        y: -20 - Math.random() * 100,
+        vx: (Math.random() - 0.5) * 2,
+        vy: 1 + Math.random() * 2,
+        size: 12 + Math.random() * 16,
+        rotation: Math.random() * Math.PI * 2,
+        life: 1,
+        emoji: ['⭐', '🌟', '✨', '💫'][Math.floor(Math.random() * 4)],
+      });
+    }
+  }
+
+  _drawEffects(ctx) {
+    const w = this.canvas.width;
+    const h = this.canvas.height;
+
+    // 屏幕闪光
+    if (this.screenFlash > 0.01) {
+      ctx.save();
+      ctx.globalAlpha = this.screenFlash;
+      ctx.fillStyle = this.screenFlashColor;
+      ctx.fillRect(0, 0, w, h);
+      ctx.restore();
+    }
+
+    // 彩虹波纹
+    this.ripples.forEach(r => {
+      ctx.save();
+      ctx.globalAlpha = r.life * 0.6;
+      ctx.strokeStyle = r.color;
+      ctx.lineWidth = r.lineWidth * r.life;
+      ctx.beginPath();
+      ctx.arc(r.x, r.y, r.radius, 0, Math.PI * 2);
+      ctx.stroke();
+      ctx.restore();
+    });
+
+    // 飞行星星
+    this.flyingStars.forEach(s => {
+      ctx.save();
+      ctx.globalAlpha = Math.min(1, s.life * 2);
+      ctx.font = `${s.size * s.scale}px Arial`;
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText('⭐', s.x, s.y);
+      ctx.restore();
+    });
+
+    // 星星雨
+    this.starRain.forEach(s => {
+      ctx.save();
+      ctx.globalAlpha = s.life;
+      ctx.translate(s.x, s.y);
+      ctx.rotate(s.rotation);
+      ctx.font = `${s.size}px Arial`;
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText(s.emoji, 0, 0);
+      ctx.restore();
+    });
+
+    // 连击文字
+    if (this.comboTextTimer > 0) {
+      ctx.save();
+      const alpha = Math.min(1, this.comboTextTimer / 20);
+      const scale = 1 + (1 - alpha) * 0.3;
+      ctx.globalAlpha = alpha;
+      ctx.translate(w / 2, h * 0.25);
+      ctx.scale(scale, scale);
+      ctx.font = 'bold 52px "Arial Rounded MT Bold", Nunito, Arial, sans-serif';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillStyle = '#FFD700';
+      ctx.shadowColor = 'rgba(0,0,0,0.3)';
+      ctx.shadowBlur = 8;
+      ctx.fillText(this.comboText, 0, 0);
+      ctx.restore();
+    }
+  }
+
   draw() {
     const ctx = this.ctx;
     const w = this.canvas.width;
@@ -450,6 +635,9 @@ class Game {
       ctx.fillRect(-c.size / 2, -c.size / 2, c.size, c.size * 0.6);
       ctx.restore();
     });
+
+    // 正向刺激特效
+    this._drawEffects(ctx);
 
     // 手部高亮光标
     this.handCursor.draw(ctx);

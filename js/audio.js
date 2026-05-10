@@ -216,5 +216,25 @@ const AudioManager = {
       osc.start(t + delay);
       osc.stop(t + delay + 0.18);
     });
+  },
+
+  // 连击特效音（上行琶音，比 cheer 更华丽）
+  playStreakBonus() {
+    const ctx = this._getCtx();
+    const t = ctx.currentTime;
+    const notes = [523, 659, 784, 1047, 1319, 1568]; // C5-E5-G5-C6-E6-G6
+    notes.forEach((freq, i) => {
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = 'triangle';
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.frequency.value = freq;
+      const start = t + i * 0.07;
+      gain.gain.setValueAtTime(0, start);
+      gain.gain.linearRampToValueAtTime(0.15, start + 0.02);
+      gain.gain.exponentialRampToValueAtTime(0.01, start + 0.4);
+      osc.start(start);
+      osc.stop(start + 0.4);
+    });
   }
-};
