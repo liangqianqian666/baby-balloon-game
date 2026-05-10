@@ -79,36 +79,39 @@ body {
 #level-buttons {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 10px;
   max-width: 900px;
   padding: 0 20px;
+  width: 100%;
 }
 
-.level-category-header {
+.level-row {
   display: flex;
-  align-items: baseline;
-  gap: 8px;
-  margin-top: 8px;
-  margin-bottom: 4px;
-  padding-left: 4px;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 10px;
+  background: rgba(255,255,255,0.5);
+  border-radius: 16px;
 }
 
-.cat-name {
-  font-size: 20px;
+.level-topic {
+  font-size: 16px;
   font-weight: bold;
   color: #555;
+  min-width: 140px;
+  text-align: left;
 }
 
-.cat-desc {
-  font-size: 14px;
+.level-btn-locked {
+  opacity: 0.35;
+  cursor: not-allowed !important;
+  position: relative;
+}
+
+.level-locked-tag {
+  font-size: 10px;
   color: #999;
-}
-
-.level-grid {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 16px;
-  justify-content: center;
+  font-style: italic;
 }
 
 .level-btn {
