@@ -40,7 +40,7 @@ window.addEventListener('DOMContentLoaded', () => {
 
   // 从 localStorage 恢复图片风格
   const savedStyle = localStorage.getItem('imageStyle');
-  if (savedStyle && ['svg', 'photo'].includes(savedStyle)) {
+  if (savedStyle && ['svg', 'photo', 'emoji'].includes(savedStyle)) {
     CONFIG.imageStyle = savedStyle;
   }
 
