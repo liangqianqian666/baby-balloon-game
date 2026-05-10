@@ -2,7 +2,7 @@
 
 const CONFIG = {
   // 游戏参数
-  starsToWin: 15,
+  starsToWin: 10,
   balloonCount: 4,
   balloonRadius: 110,
 
@@ -34,4 +34,7 @@ const CONFIG = {
 
   // 背景模式: 'none' = 纯摄像头无背景, 'transparent' = 半透明童趣背景
   backgroundMode: 'none',
+
+  // 图片风格: 'svg' = 手绘SVG, 'photo' = 实物照片
+  imageStyle: 'svg',
 };
