@@ -78,40 +78,55 @@ function showLevelSelect() {
   const container = document.getElementById('level-buttons');
   container.innerHTML = '';
 
+  function makeBtn(key, icon, name) {
+    const level = LEVELS[key];
+    const progress = SpacedRep.getLevelProgress(key);
+    const btn = document.createElement('button');
+    btn.className = 'level-btn';
+
+    let progressDot = '';
+    if (progress && progress.mastered === progress.total) {
+      progressDot = '<span class="level-complete">✓</span>';
+    } else if (progress && progress.reviewDue > 0) {
+      progressDot = `<span class="level-due" title="${progress.reviewDue}个词需要复习">复习${progress.reviewDue}</span>`;
+    }
+
+    btn.innerHTML = `<span class="level-icon">${icon}</span><span class="level-name">${name}</span>${progressDot}`;
+    btn.onclick = () => startGame(key);
+    return btn;
+  }
+
   LEVEL_CATEGORIES.forEach(cat => {
-    // 过滤出存在的关卡
-    const validKeys = cat.levels.filter(k => LEVELS[k]);
-    if (validKeys.length === 0) return;
+    if (!LEVELS[cat.basic]) return;
 
-    // 分类标题
-    const header = document.createElement('div');
-    header.className = 'level-category-header';
-    header.innerHTML = `<span class="cat-name">${cat.name}</span><span class="cat-desc">${cat.description}</span>`;
-    container.appendChild(header);
+    const row = document.createElement('div');
+    row.className = 'level-row';
 
-    // 关卡按钮网格
-    const grid = document.createElement('div');
-    grid.className = 'level-grid';
+    // 主题标签
+    const topic = document.createElement('span');
+    topic.className = 'level-topic';
+    topic.innerHTML = `${cat.icon} ${cat.topic}`;
+    row.appendChild(topic);
 
-    validKeys.forEach(key => {
-      const level = LEVELS[key];
-      const progress = SpacedRep.getLevelProgress(key);
-      const btn = document.createElement('button');
-      btn.className = 'level-btn';
+    // 基础玩法按钮
+    const level = LEVELS[cat.basic];
+    const basicBtn = makeBtn(cat.basic, '📚', 'Basic');
+    row.appendChild(basicBtn);
 
-      let progressDot = '';
-      if (progress && progress.mastered === progress.total) {
-        progressDot = '<span class="level-complete">✓</span>';
-      } else if (progress && progress.reviewDue > 0) {
-        progressDot = `<span class="level-due" title="${progress.reviewDue}个词需要复习">复习${progress.reviewDue}</span>`;
-      }
+    // 进阶玩法按钮
+    if (cat.advanced && LEVELS[cat.advanced]) {
+      const advBtn = makeBtn(cat.advanced, cat.advancedIcon, cat.advancedName);
+      row.appendChild(advBtn);
+    } else {
+      // 灰色占位
+      const placeholder = document.createElement('button');
+      placeholder.className = 'level-btn level-btn-locked';
+      placeholder.disabled = true;
+      placeholder.innerHTML = `<span class="level-icon">${cat.advancedIcon || '🔒'}</span><span class="level-name">${cat.advancedName || 'Coming'}</span><span class="level-locked-tag">Soon</span>`;
+      row.appendChild(placeholder);
+    }
 
-      btn.innerHTML = `<span class="level-icon">${level.icon}</span><span class="level-name">${level.name}</span>${progressDot}`;
-      btn.onclick = () => startGame(key);
-      grid.appendChild(btn);
-    });
-
-    container.appendChild(grid);
+    container.appendChild(row);
   });
 }
 

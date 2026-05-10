@@ -61,16 +61,27 @@ class Balloon {
   _resolveDisplay() {
     this._img = null;
     this._useEmoji = false;
+    this._loadFailed = false;
 
     if (CONFIG.imageStyle === 'photo' && this.item.photo) {
       // 实物照片模式
-      this._img = preloadImage(this.item.photo);
+      const img = preloadImage(this.item.photo);
+      img.onerror = () => { this._loadFailed = true; this._fallbackToEmoji(); };
+      this._img = img;
     } else if (CONFIG.imageStyle === 'emoji' && this.item.emoji) {
       // Emoji 模式
       this._useEmoji = true;
     } else if (this.item.display && this.item.display.startsWith('assets/')) {
       // 手绘 SVG 模式（默认）
       this._img = preloadImage(this.item.display);
+    }
+  }
+
+  // 图片加载失败时回退到 emoji
+  _fallbackToEmoji() {
+    this._img = null;
+    if (this.item.emoji) {
+      this._useEmoji = true;
     }
   }
 
@@ -215,14 +226,38 @@ class Balloon {
       ctx.beginPath();
       ctx.arc(drawX, this.y, r * 1.1, 0, Math.PI * 2);
       ctx.fill();
-      // 圆形边框
       ctx.strokeStyle = 'rgba(0,0,0,0.08)';
       ctx.lineWidth = 2;
       ctx.stroke();
-      // 绘制图片
       const imgSize = r * 2;
       ctx.drawImage(this._img, drawX - imgSize / 2, this.y - imgSize / 2, imgSize, imgSize);
-    } else {
+    } else if (this._img && !this._img.complete) {
+      // === 图片还在加载中，画占位圆 ===
+      ctx.fillStyle = 'rgba(255,255,255,0.5)';
+      ctx.beginPath();
+      ctx.arc(drawX, this.y, r * 1.1, 0, Math.PI * 2);
+      ctx.fill();
+    } else if (this._img && this._img.complete && this._img.naturalWidth === 0) {
+      // === 图片加载失败，回退到 emoji ===
+      this._fallbackToEmoji();
+      // 画 emoji 或 label
+      if (this._useEmoji) {
+        ctx.fillStyle = 'rgba(255,255,255,0.85)';
+        ctx.beginPath();
+        ctx.arc(drawX, this.y, r * 1.1, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.font = `${r * 1.6}px Arial, sans-serif`;
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(this.item.emoji, drawX, this.y);
+      } else {
+        ctx.font = `bold ${r * 0.6}px Arial, sans-serif`;
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillStyle = this.item.color || '#333';
+        ctx.fillText(this.item.label, drawX, this.y);
+      }
+    } else if (this.item.display && !this.item.display.startsWith('assets/')) {
       // === 文本模式（数字等） ===
       ctx.font = `${r * 1.6}px Arial, sans-serif`;
       ctx.textAlign = 'center';

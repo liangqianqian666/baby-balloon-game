@@ -322,16 +322,118 @@ const LEVELS = {
   },
 };
 
-// 关卡分类
+// 关卡分类：每个主题有基础玩法和进阶玩法
 const LEVEL_CATEGORIES = [
   {
-    name: '📚 Basic',
-    description: 'Find the right one!',
-    levels: ['colors', 'numbers', 'numbers2', 'shapes', 'animals', 'fruits', 'vegetables', 'food', 'body', 'vehicles', 'clothing', 'weather', 'emotions', 'community', 'daily', 'home'],
+    topic: 'Colors', icon: '🎨',
+    basic: 'colors',        // 找颜色
+    advanced: null,          // 待开发：颜色+物品组合 "Find the red apple"
+    advancedName: 'Color Mix',
+    advancedIcon: '🎯',
   },
-  // {
-  //   name: '🎮 Special',
-  //   description: 'Fun gameplay!',
-  //   levels: ['juice_bar'],  // 待实现
-  // },
+  {
+    topic: 'Numbers 1-10', icon: '🔢',
+    basic: 'numbers',
+    advanced: null,          // 待开发：数数 "How many apples?"
+    advancedName: 'Counting',
+    advancedIcon: '🧮',
+  },
+  {
+    topic: 'Numbers 11-20', icon: '🔟',
+    basic: 'numbers2',
+    advanced: null,
+    advancedName: 'Counting',
+    advancedIcon: '🧮',
+  },
+  {
+    topic: 'Shapes', icon: '🔷',
+    basic: 'shapes',
+    advanced: null,          // 待开发：形状拼图
+    advancedName: 'Shape Puzzle',
+    advancedIcon: '🧩',
+  },
+  {
+    topic: 'Animals', icon: '🐾',
+    basic: 'animals',
+    advanced: null,          // 待开发：动物叫声匹配
+    advancedName: 'Sound Match',
+    advancedIcon: '🔊',
+  },
+  {
+    topic: 'Fruits', icon: '🍎',
+    basic: 'fruits',
+    advanced: null,          // 待开发：榨汁机
+    advancedName: 'Juice Bar',
+    advancedIcon: '🧃',
+  },
+  {
+    topic: 'Vegetables', icon: '🥕',
+    basic: 'vegetables',
+    advanced: null,
+    advancedName: 'Cooking',
+    advancedIcon: '🍳',
+  },
+  {
+    topic: 'Food', icon: '🍕',
+    basic: 'food',
+    advanced: null,
+    advancedName: 'Kitchen',
+    advancedIcon: '👨‍🍳',
+  },
+  {
+    topic: 'Body', icon: '🖐️',
+    basic: 'body',
+    advanced: null,          // 待开发：指认身体部位
+    advancedName: 'Simon Says',
+    advancedIcon: '🤸',
+  },
+  {
+    topic: 'Vehicles', icon: '🚗',
+    basic: 'vehicles',
+    advanced: null,
+    advancedName: 'Drive!',
+    advancedIcon: '🏎️',
+  },
+  {
+    topic: 'Clothing', icon: '👕',
+    basic: 'clothing',
+    advanced: null,
+    advancedName: 'Dress Up',
+    advancedIcon: '👗',
+  },
+  {
+    topic: 'Weather', icon: '☀️',
+    basic: 'weather',
+    advanced: null,
+    advancedName: 'Forecast',
+    advancedIcon: '🌈',
+  },
+  {
+    topic: 'Feelings', icon: '😊',
+    basic: 'emotions',
+    advanced: null,
+    advancedName: 'Act It Out',
+    advancedIcon: '🎭',
+  },
+  {
+    topic: 'Helpers', icon: '👨‍🚒',
+    basic: 'community',
+    advanced: null,
+    advancedName: 'Role Play',
+    advancedIcon: '🦸',
+  },
+  {
+    topic: 'Daily Life', icon: '🏠',
+    basic: 'daily',
+    advanced: null,
+    advancedName: 'Routine',
+    advancedIcon: '⏰',
+  },
+  {
+    topic: 'Home', icon: '🏡',
+    basic: 'home',
+    advanced: null,
+    advancedName: 'Clean Up',
+    advancedIcon: '🧹',
+  },
 ];
