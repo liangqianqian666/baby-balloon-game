@@ -22,6 +22,9 @@ class Game {
     this.comboTextTimer = 0;
     this.ripples = [];        // 彩虹波纹
     this.starRain = [];       // 星星雨
+    this.hintTimer = 0;       // 找不到计时器
+    this.hintLevel = 0;       // 提示等级 0=无 1=轻提示 2=强提示
+    this.celebEmojis = [];    // 答对后飘出的大表情
 
     // 关卡
     this.level = null;
@@ -105,6 +108,8 @@ class Game {
 
     this.targetItem = SpacedRep.pickTarget(this.levelKey, aliveItems);
     this.state = 'playing';
+    this.hintTimer = 0;
+    this.hintLevel = 0;
 
     const hint = document.getElementById('color-hint');
     hint.textContent = this.targetItem.label;
@@ -168,6 +173,25 @@ class Game {
     this.starRain.forEach(s => { s.y += s.vy; s.x += s.vx; s.vy += 0.08; s.rotation += 0.05; s.life -= 0.008; });
     this.starRain = this.starRain.filter(s => s.life > 0);
 
+    // 更新庆祝表情
+    this.celebEmojis.forEach(e => { e.y -= 1.5; e.life -= 0.015; e.scale += 0.005; });
+    this.celebEmojis = this.celebEmojis.filter(e => e.life > 0);
+
+    // 找不到提示计时
+    if (this.state === 'playing') {
+      this.hintTimer++;
+      // 4秒（~240帧）→ 轻提示：正确气球开始闪烁 + 中文提示
+      if (this.hintTimer === 240 && this.hintLevel < 1) {
+        this.hintLevel = 1;
+        this._showChineseHint();
+      }
+      // 8秒（~480帧）→ 强提示：正确气球高亮箭头指向
+      if (this.hintTimer === 480 && this.hintLevel < 2) {
+        this.hintLevel = 2;
+        AudioManager.speakGeneric('Here!');
+      }
+    }
+
     // 碰撞检测（需要停留才触发）
     if (this.state === 'playing') {
       const hands = this.handCursor.getActivePositions();
@@ -211,6 +235,7 @@ class Game {
     AudioManager.playPop();
     setTimeout(() => AudioManager.playCheer(), 150);
     this.spawnConfetti(balloon.x, balloon.y);
+    this._spawnCelebEmoji(balloon.x, balloon.y);
 
     // 立即清掉旧单词
     document.getElementById('color-hint').textContent = '⭐';
@@ -299,6 +324,56 @@ class Game {
     ctx.arc(x + size * 0.8, y, size * 0.45, 0, Math.PI * 2);
     ctx.arc(x + size * 0.35, y + size * 0.15, size * 0.35, 0, Math.PI * 2);
     ctx.fill();
+  }
+
+  // === 中文提示 ===
+
+  _showChineseHint() {
+    const hint = document.getElementById('color-hint');
+    // 在英文下方加中文小提示
+    const cnMap = {
+      red:'红色', blue:'蓝色', yellow:'黄色', green:'绿色', purple:'紫色',
+      orange:'橙色', pink:'粉色', white:'白色', black:'黑色', brown:'棕色',
+      one:'1', two:'2', three:'3', four:'4', five:'5', six:'6', seven:'7',
+      eight:'8', nine:'9', ten:'10', eleven:'11', twelve:'12',
+      circle:'圆形', square:'正方形', triangle:'三角形', star:'星形',
+      heart:'心形', diamond:'菱形', rectangle:'长方形', oval:'椭圆',
+      apple:'苹果', banana:'香蕉', grape:'葡萄', watermelon:'西瓜',
+      strawberry:'草莓', orange_fruit:'橙子', peach:'桃子', cherry:'樱桃',
+      cat:'猫', dog:'狗', rabbit:'兔子', bear:'熊', elephant:'大象',
+      lion:'狮子', monkey:'猴子', bird:'鸟', fish:'鱼', panda:'熊猫',
+      tiger:'老虎', giraffe:'长颈鹿',
+      head:'头', eyes:'眼睛', nose:'鼻子', mouth:'嘴巴', ears:'耳朵',
+      hands:'手', feet:'脚', arms:'胳膊', legs:'腿', tummy:'肚子',
+      car:'汽车', bus:'公共汽车', train:'火车', airplane:'飞机', boat:'船',
+      bicycle:'自行车', helicopter:'直升机', rocket:'火箭',
+      sun:'太阳', moon:'月亮', cloud:'云', rain:'雨', snow:'雪', wind:'风',
+      rainbow:'彩虹', thunder:'雷',
+      happy:'开心', sad:'伤心', angry:'生气', surprised:'惊讶',
+      scared:'害怕', sleepy:'困了', silly:'傻傻的', love:'爱',
+    };
+    const cn = cnMap[this.targetItem.id];
+    if (cn) {
+      hint.innerHTML = `${this.targetItem.label}<br><span style="font-size:32px;color:#555">找${cn}的！👆</span>`;
+    } else {
+      hint.innerHTML = `${this.targetItem.label}<br><span style="font-size:32px;color:#555">找这个！👆</span>`;
+    }
+  }
+
+  // === 庆祝表情 ===
+
+  _spawnCelebEmoji(x, y) {
+    const emojis = ['🎉', '👏', '🥳', '💪', '🤩', '😍', '🙌', '💖', '🎊', '👍'];
+    for (let i = 0; i < 3; i++) {
+      this.celebEmojis.push({
+        x: x + (Math.random() - 0.5) * 120,
+        y: y + (Math.random() - 0.5) * 60,
+        emoji: emojis[Math.floor(Math.random() * emojis.length)],
+        life: 1,
+        scale: 1 + Math.random() * 0.5,
+        size: 36 + Math.random() * 24,
+      });
+    }
   }
 
   // === 正向刺激特效 ===
@@ -510,13 +585,47 @@ class Game {
       }
     }
 
-    // 气球（支持淡入）
+    // 气球（支持淡入 + 提示闪烁）
     this.balloons.forEach(b => {
       if (b.fadeIn !== undefined && b.fadeIn < 1 && !b.popping) {
         ctx.globalAlpha = b.fadeIn;
       }
       b.draw(ctx, this.time);
       ctx.globalAlpha = 1;
+
+      // 提示高亮：正确气球闪烁光圈
+      if (this.hintLevel >= 1 && this.targetItem && b.item.id === this.targetItem.id && !b.popping) {
+        ctx.save();
+        const pulse = Math.sin(this.time * 0.1) * 0.3 + 0.5;
+        ctx.globalAlpha = pulse;
+        ctx.strokeStyle = '#FFD700';
+        ctx.lineWidth = this.hintLevel >= 2 ? 8 : 4;
+        ctx.shadowColor = '#FFD700';
+        ctx.shadowBlur = this.hintLevel >= 2 ? 25 : 12;
+        ctx.beginPath();
+        ctx.arc(b.x, b.y, b.radius * 1.3, 0, Math.PI * 2);
+        ctx.stroke();
+
+        // 强提示：画箭头指向
+        if (this.hintLevel >= 2) {
+          ctx.globalAlpha = pulse;
+          ctx.font = '48px Arial';
+          ctx.textAlign = 'center';
+          ctx.fillText('👇', b.x, b.y - b.radius * 1.5);
+        }
+        ctx.restore();
+      }
+    });
+
+    // 庆祝表情
+    this.celebEmojis.forEach(e => {
+      ctx.save();
+      ctx.globalAlpha = e.life;
+      ctx.font = `${e.size * e.scale}px Arial`;
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText(e.emoji, e.x, e.y);
+      ctx.restore();
     });
 
     // 撒花
