@@ -207,6 +207,7 @@ class Game {
       for (const balloon of this.balloons) {
         if (balloon.popping) continue;
         if (balloon.fadeIn !== undefined && balloon.fadeIn < 0.8) continue;
+        if (balloon.immunity > 0) continue;
 
         let touching = false;
         for (const hand of hands) {
