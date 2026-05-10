@@ -2,9 +2,9 @@
 
 const CONFIG = {
   // 游戏参数
-  starsToWin: 20,
+  starsToWin: 15,
   balloonCount: 4,
-  balloonRadius: 65,
+  balloonRadius: 110,
 
   // 生词/熟词配比
   newItemRatio: 0.4,       // 40% 概率选全新词
@@ -28,4 +28,10 @@ const CONFIG = {
 
   // target 选择偏好
   targetPreferNew: 0.7, // 70% 概率从生词/学习中选 target
+
+  // 当前角色
+  currentProfile: 'Luna',
+
+  // 背景模式: 'none' = 纯摄像头无背景, 'transparent' = 半透明童趣背景
+  backgroundMode: 'none',
 };

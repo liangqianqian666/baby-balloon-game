@@ -34,8 +34,7 @@ class Game {
   }
 
   // 根据 MoveNet 关键点更新孩子的活动区域
-  // keypoints 索引: 0=nose, 1=leftEye, 2=rightEye, 5=leftShoulder, 6=rightShoulder,
-  //   9=leftWrist, 10=rightWrist, 11=leftHip, 12=rightHip
+  // keypoints 索引: 0=nose, 5=leftShoulder, 6=rightShoulder, 9=leftWrist, 10=rightWrist
   updateBodyZone(keypoints, videoW, videoH) {
     if (!keypoints || keypoints.length < 13) return;
 
@@ -43,27 +42,20 @@ class Game {
     const h = this.canvas.height;
     const minConf = 0.3;
 
-    // 收集可信的关键点
     const nose = keypoints[0];
     const leftShoulder = keypoints[5];
     const rightShoulder = keypoints[6];
-    const leftWrist = keypoints[9];
-    const rightWrist = keypoints[10];
 
-    // 至少需要鼻子或肩膀可见
     if ((!nose || nose.score < minConf) &&
         (!leftShoulder || leftShoulder.score < minConf) &&
         (!rightShoulder || rightShoulder.score < minConf)) return;
 
-    // 映射到屏幕坐标（镜像翻转）
     const mapX = (kp) => (1 - kp.x / videoW) * w;
     const mapY = (kp) => (kp.y / videoH) * h;
 
-    // 估算头顶（鼻子往上一段距离）
-    let headTopY = h * 0.15; // 默认
+    let headTopY = h * 0.15;
     if (nose && nose.score >= minConf) {
       const noseY = mapY(nose);
-      // 头顶大约在鼻子上方，头部高度约为肩宽的 0.7 倍
       let headHeight = h * 0.08;
       if (leftShoulder && rightShoulder &&
           leftShoulder.score >= minConf && rightShoulder.score >= minConf) {
@@ -72,7 +64,6 @@ class Game {
       headTopY = noseY - headHeight;
     }
 
-    // 估算手能举到的最高点：头顶再往上一个手臂长度（约肩宽 * 1.5）
     let armReach = h * 0.15;
     if (leftShoulder && rightShoulder &&
         leftShoulder.score >= minConf && rightShoulder.score >= minConf) {
@@ -80,7 +71,6 @@ class Game {
     }
     const reachTopY = Math.max(30, headTopY - armReach * 0.3);
 
-    // 左右范围：身体中心 ± 手臂伸展
     let centerX = w / 2;
     if (leftShoulder && rightShoulder &&
         leftShoulder.score >= minConf && rightShoulder.score >= minConf) {
@@ -91,14 +81,13 @@ class Game {
     const reachLeftX = Math.max(70, centerX - armReach * 1.5);
     const reachRightX = Math.min(w - 70, centerX + armReach * 1.5);
 
-    // 底部范围：肩膀附近（不要太低，低了孩子反而不举手了）
     let shoulderY = h * 0.5;
     if (leftShoulder && leftShoulder.score >= minConf) {
       shoulderY = mapY(leftShoulder);
     } else if (rightShoulder && rightShoulder.score >= minConf) {
       shoulderY = mapY(rightShoulder);
     }
-    const reachBottomY = shoulderY - armReach * 0.1; // 稍微高于肩膀
+    const reachBottomY = shoulderY - armReach * 0.1;
 
     const target = {
       topY: reachTopY,
@@ -108,7 +97,6 @@ class Game {
       centerX: centerX,
     };
 
-    // 平滑更新
     if (!this.bodyZone) {
       this.bodyZone = target;
       this._calibrated = true;
@@ -121,7 +109,6 @@ class Game {
       this.bodyZone.centerX += (target.centerX - this.bodyZone.centerX) * s;
     }
 
-    // 重新定位气球到活动区域
     this._repositionBalloons();
   }
 
@@ -234,11 +221,16 @@ class Game {
   async update() {
     this.time++;
 
-    const keypoints = await Camera.detect();
+    // MediaPipe Hands → 手部光标
+    const handsLandmarks = Camera.detectHands();
+    if (handsLandmarks) {
+      this.handCursor.update(handsLandmarks, this.canvas.width, this.canvas.height);
+    }
+
+    // MoveNet → 身体姿态 → 气球布局
+    const keypoints = await Camera.detectPose();
     if (keypoints) {
       const vs = Camera.getVideoSize();
-      this.handCursor.update(keypoints, vs.width, vs.height, this.canvas.width, this.canvas.height);
-      // 根据身体关键点自适应气球位置
       this.updateBodyZone(keypoints, vs.width, vs.height);
     }
 
@@ -384,43 +376,49 @@ class Game {
     const h = this.canvas.height;
     ctx.clearRect(0, 0, w, h);
 
-    // === 童趣背景 ===
-    // 天空渐变
-    const skyGrad = ctx.createLinearGradient(0, 0, 0, h * 0.75);
-    skyGrad.addColorStop(0, '#87CEEB');
-    skyGrad.addColorStop(1, '#E0F7FF');
-    ctx.fillStyle = skyGrad;
-    ctx.fillRect(0, 0, w, h);
-
-    // 草地
-    const grassGrad = ctx.createLinearGradient(0, h * 0.75, 0, h);
-    grassGrad.addColorStop(0, '#90D26D');
-    grassGrad.addColorStop(1, '#6BBF4E');
-    ctx.fillStyle = grassGrad;
-    ctx.beginPath();
-    ctx.moveTo(0, h * 0.78);
-    // 轻微波浪草地线
-    for (let x = 0; x <= w; x += w / 8) {
-      ctx.quadraticCurveTo(x + w / 16, h * 0.75 + Math.sin(x * 0.005 + this.time * 0.01) * 8, x + w / 8, h * 0.78);
-    }
-    ctx.lineTo(w, h);
-    ctx.lineTo(0, h);
-    ctx.closePath();
-    ctx.fill();
-
-    // 白云（用时间做缓慢飘动）
-    this._drawCloud(ctx, ((this.time * 0.15) % (w + 200)) - 100, h * 0.12, 60);
-    this._drawCloud(ctx, ((this.time * 0.1 + w * 0.5) % (w + 200)) - 100, h * 0.22, 45);
-    this._drawCloud(ctx, ((this.time * 0.08 + w * 0.25) % (w + 200)) - 100, h * 0.08, 35);
-
-    // === 合成人像（抠图后） ===
+    // === 背景渲染（根据 CONFIG.backgroundMode） ===
+    const bgMode = CONFIG.backgroundMode;
     const video = document.getElementById('pose-video');
-    if (video.readyState >= 2) {
-      const segOk = Camera.drawSegmented(ctx, w, h);
-      if (!segOk) {
-        // 分割模型还没就绪，fallback：画半透明视频
+
+    if (bgMode === 'none') {
+      // 纯摄像头画面，无背景装饰
+      if (video.readyState >= 2) {
         ctx.save();
-        ctx.globalAlpha = 0.7;
+        ctx.translate(w, 0);
+        ctx.scale(-1, 1);
+        ctx.drawImage(video, 0, 0, w, h);
+        ctx.restore();
+      }
+    } else if (bgMode === 'transparent') {
+      // 先画童趣背景
+      const skyGrad = ctx.createLinearGradient(0, 0, 0, h * 0.75);
+      skyGrad.addColorStop(0, '#87CEEB');
+      skyGrad.addColorStop(1, '#E0F7FF');
+      ctx.fillStyle = skyGrad;
+      ctx.fillRect(0, 0, w, h);
+
+      const grassGrad = ctx.createLinearGradient(0, h * 0.75, 0, h);
+      grassGrad.addColorStop(0, '#90D26D');
+      grassGrad.addColorStop(1, '#6BBF4E');
+      ctx.fillStyle = grassGrad;
+      ctx.beginPath();
+      ctx.moveTo(0, h * 0.78);
+      for (let x = 0; x <= w; x += w / 8) {
+        ctx.quadraticCurveTo(x + w / 16, h * 0.75 + Math.sin(x * 0.005 + this.time * 0.01) * 8, x + w / 8, h * 0.78);
+      }
+      ctx.lineTo(w, h);
+      ctx.lineTo(0, h);
+      ctx.closePath();
+      ctx.fill();
+
+      this._drawCloud(ctx, ((this.time * 0.15) % (w + 200)) - 100, h * 0.12, 60);
+      this._drawCloud(ctx, ((this.time * 0.1 + w * 0.5) % (w + 200)) - 100, h * 0.22, 45);
+      this._drawCloud(ctx, ((this.time * 0.08 + w * 0.25) % (w + 200)) - 100, h * 0.08, 35);
+
+      // 半透明摄像头叠加
+      if (video.readyState >= 2) {
+        ctx.save();
+        ctx.globalAlpha = 0.5;
         ctx.translate(w, 0);
         ctx.scale(-1, 1);
         ctx.drawImage(video, 0, 0, w, h);

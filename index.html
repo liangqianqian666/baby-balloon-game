@@ -10,7 +10,25 @@
   <!-- 关卡选择界面 -->
   <div id="level-screen">
     <div class="level-content">
-      <h2>🎈 Pick a Game!</h2>
+      <h1 style="font-size: 36px; color: #FF6B6B; text-shadow: 2px 2px 0 #fff; margin-bottom: 4px;">Pop the Balloon! 🎈</h1>
+      <p style="font-size: 16px; color: #888; margin-bottom: 4px; font-style: italic;">For Luna, my everything</p>
+      <p style="font-size: 13px; color: #aaa; margin-bottom: 20px;">Made by Luna's mama Sisi ⭐</p>
+      <h2>Pick a Game!</h2>
+      <div id="profile-selector" style="margin-bottom: 16px;">
+        <span style="font-size: 16px; color: #555; margin-right: 8px;">👤 玩家：</span>
+        <div id="profile-list" style="display: inline-flex; gap: 6px; align-items: center; flex-wrap: wrap;"></div>
+      </div>
+      <div id="bg-toggle" style="margin-bottom: 20px;">
+        <span style="font-size: 16px; color: #555; margin-right: 8px;">背景模式：</span>
+        <button class="bg-mode-btn" data-mode="none">无背景</button>
+        <button class="bg-mode-btn" data-mode="transparent">半透明背景</button>
+      </div>
+      <div id="stars-toggle" style="margin-bottom: 20px;">
+        <span style="font-size: 16px; color: #555; margin-right: 8px;">通关星星：</span>
+        <button class="stars-adj-btn" id="stars-minus">−</button>
+        <span id="stars-value" style="font-size: 20px; font-weight: bold; color: #FFD700; min-width: 40px; display: inline-block; text-align: center;">15</span>
+        <button class="stars-adj-btn" id="stars-plus">+</button>
+      </div>
       <div id="level-buttons"></div>
     </div>
   </div>
@@ -30,24 +48,26 @@
   <!-- 隐藏的 video 用于 MoveNet 推理 -->
   <video id="pose-video" autoplay playsinline style="display:none"></video>
 
-  <!-- TensorFlow.js + MoveNet -->
+  <!-- TensorFlow.js + MoveNet (身体追踪) -->
   <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs-core@4.17.0/dist/tf-core.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs-converter@4.17.0/dist/tf-converter.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs-backend-webgl@4.17.0/dist/tf-backend-webgl.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/pose-detection@2.1.3/dist/pose-detection.min.js"></script>
 
-  <!-- MediaPipe Selfie Segmentation (人像抠图) -->
-  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/selfie_segmentation@0.1/selfie_segmentation.js"></script>
+  <!-- MediaPipe Hands (手部追踪) -->
+  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.js" crossorigin="anonymous"></script>
 
-  <script src="js/config.js?v=5"></script>
-  <script src="js/audio.js?v=5"></script>
-  <script src="js/analytics.js?v=5"></script>
-  <script src="js/levels.js?v=5"></script>
-  <script src="js/spaced-rep.js?v=5"></script>
-  <script src="js/balloon.js?v=5"></script>
-  <script src="js/hand-cursor.js?v=5"></script>
-  <script src="js/camera.js?v=5"></script>
-  <script src="js/game.js?v=5"></script>
-  <script src="js/main.js?v=5"></script>
+
+  <script src="js/config.js?v=7"></script>
+  <script src="js/audio.js?v=7"></script>
+  <script src="js/analytics.js?v=7"></script>
+  <script src="js/levels.js?v=7"></script>
+  <script src="js/spaced-rep.js?v=7"></script>
+  <script src="js/balloon.js?v=7"></script>
+  <script src="js/hand-cursor.js?v=7"></script>
+  <script src="js/camera.js?v=7"></script>
+  <script src="js/game.js?v=7"></script>
+  <script src="js/main.js?v=7"></script>
 </body>
 </html>

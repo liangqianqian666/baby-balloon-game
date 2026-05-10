@@ -173,7 +173,7 @@ class Balloon {
       ctx.lineWidth = 2;
       ctx.stroke();
       // 绘制图片
-      const imgSize = r * 1.6;
+      const imgSize = r * 2;
       ctx.drawImage(this._img, drawX - imgSize / 2, this.y - imgSize / 2, imgSize, imgSize);
     } else {
       // === 文本模式（数字等） ===

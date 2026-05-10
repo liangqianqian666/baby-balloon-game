@@ -43,6 +43,21 @@
   .status-reviewing { background: #FFD700; color: #333; }
   .status-mastered { background: #44CC44; }
 
+  /* 学习总结 */
+  .summary-section { background: white; border-radius: 12px; padding: 16px; margin-bottom: 16px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+  .summary-section h2 { font-size: 16px; margin-bottom: 12px; }
+  .summary-section h2.new-words { color: #4488FF; }
+  .summary-section h2.hard-words { color: #FF6B6B; }
+  .summary-section h2.mastered-words { color: #44CC44; }
+  .summary-list { display: flex; flex-wrap: wrap; gap: 8px; }
+  .summary-item { display: flex; align-items: center; gap: 6px; border-radius: 8px; padding: 6px 10px; font-size: 13px; }
+  .summary-item img { width: 28px; height: 28px; }
+  .summary-item .emoji-sm { font-size: 22px; }
+  .summary-item .meta { font-size: 10px; color: #888; }
+  .summary-new { background: #EEF4FF; border: 1px solid #CCE0FF; }
+  .summary-hard { background: #FFF5F5; border: 1px solid #FFD4D4; }
+  .summary-mastered { background: #F0FFF0; border: 1px solid #C8F0C8; }
+
   /* 复习建议 */
   .review-section { background: white; border-radius: 12px; padding: 16px; margin-top: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
   .review-section h2 { font-size: 16px; margin-bottom: 12px; color: #FF6B6B; }
@@ -60,9 +75,29 @@
   <h1>📊 宝宝学习进度</h1>
   <p class="subtitle">数据存储在本设备浏览器中</p>
 
+  <div style="text-align: center; margin-bottom: 16px;">
+    <span style="font-size: 14px; color: #888;">👤 当前玩家：</span>
+    <select id="profile-select" style="font-size: 16px; padding: 4px 12px; border-radius: 8px; border: 1px solid #ddd;"></select>
+  </div>
+
   <div class="overview" id="overview"></div>
 
   <div id="levels-container"></div>
+
+  <div class="summary-section" id="summary-new">
+    <h2 class="new-words">🌱 最近新学的词</h2>
+    <div class="summary-list" id="new-words-list"></div>
+  </div>
+
+  <div class="summary-section" id="summary-hard">
+    <h2 class="hard-words">⚠️ 经常答错的词</h2>
+    <div class="summary-list" id="hard-words-list"></div>
+  </div>
+
+  <div class="summary-section" id="summary-mastered">
+    <h2 class="mastered-words">🏆 已经掌握的词</h2>
+    <div class="summary-list" id="mastered-words-list"></div>
+  </div>
 
   <div class="review-section" id="review-section">
     <h2>⏰ 需要复习的词汇</h2>
@@ -71,11 +106,33 @@
 
   <button class="back-btn" onclick="location.href='index.html'">← 返回游戏</button>
 
-  <script src="js/config.js?v=5"></script>
-  <script src="js/levels.js?v=5"></script>
-  <script src="js/spaced-rep.js?v=5"></script>
-  <script src="js/analytics.js?v=5"></script>
+  <script src="js/config.js?v=7"></script>
+  <script src="js/levels.js?v=7"></script>
+  <script src="js/spaced-rep.js?v=7"></script>
+  <script src="js/analytics.js?v=7"></script>
   <script>
+    // 恢复当前角色
+    const savedProfile = localStorage.getItem('balloon-current-profile');
+    if (savedProfile) CONFIG.currentProfile = savedProfile;
+
+    // 填充角色下拉框
+    const profileSelect = document.getElementById('profile-select');
+    let profiles = [];
+    try { profiles = JSON.parse(localStorage.getItem('balloon-profiles') || '["Luna"]'); } catch(e) { profiles = ['Luna']; }
+    profiles.forEach(name => {
+      const opt = document.createElement('option');
+      opt.value = name;
+      opt.textContent = name;
+      if (name === CONFIG.currentProfile) opt.selected = true;
+      profileSelect.appendChild(opt);
+    });
+    profileSelect.onchange = () => {
+      CONFIG.currentProfile = profileSelect.value;
+      localStorage.setItem('balloon-current-profile', profileSelect.value);
+      renderAll();
+    };
+
+    function renderAll() {
     SpacedRep.init();
 
     // 总览
@@ -170,6 +227,69 @@
         return `<div class="review-item">${img}<span>${item.label}</span><span class="retention">${retPct}%</span></div>`;
       }).join('');
     }
+
+    // === 学习总结：新学的 / 经常错的 / 已掌握的 ===
+    const newWords = [], hardWords = [], masteredWords = [];
+    Object.keys(LEVELS).forEach(key => {
+      const level = LEVELS[key];
+      level.items.forEach(item => {
+        const status = SpacedRep.getItemStatus(key, item.id);
+        const entry = SpacedRep._data[key] && SpacedRep._data[key][item.id];
+        if (!entry) return; // 从未见过，跳过
+
+        const total = entry.correct + entry.wrong;
+        const accuracy = total > 0 ? entry.correct / total : 0;
+        const info = { ...item, levelName: level.name, levelIcon: level.icon, entry, accuracy, total };
+
+        if (status === 'mastered') {
+          masteredWords.push(info);
+        } else if (entry.wrong >= 2 && accuracy < 0.7) {
+          hardWords.push(info);
+        }
+        if (status === 'learning' || status === 'reviewing') {
+          newWords.push(info);
+        }
+      });
+    });
+
+    // 新学的：按最近练习时间排序
+    newWords.sort((a, b) => b.entry.lastSeen - a.entry.lastSeen);
+    // 经常错的：按错误率排序（错误率高的在前）
+    hardWords.sort((a, b) => a.accuracy - b.accuracy);
+    // 已掌握的：按正确次数排序
+    masteredWords.sort((a, b) => b.entry.correct - a.entry.correct);
+
+    function renderItemIcon(item) {
+      if (item.display && item.display.startsWith('assets/')) {
+        return `<img src="${item.display}">`;
+      } else if (item.display) {
+        return `<span class="emoji-sm">${item.display}</span>`;
+      } else {
+        return `<span class="emoji-sm" style="background:${item.color};width:22px;height:22px;border-radius:50%;display:inline-block"></span>`;
+      }
+    }
+
+    document.getElementById('new-words-list').innerHTML = newWords.length === 0
+      ? '<span class="empty-msg">还没有新学的词</span>'
+      : newWords.slice(0, 30).map(item =>
+          `<div class="summary-item summary-new">${renderItemIcon(item)}<span>${item.label}</span><span class="meta">${item.levelIcon} 练${item.total}次</span></div>`
+        ).join('');
+
+    document.getElementById('hard-words-list').innerHTML = hardWords.length === 0
+      ? '<span class="empty-msg">没有经常答错的词 🎉</span>'
+      : hardWords.slice(0, 30).map(item => {
+          const accPct = (item.accuracy * 100).toFixed(0);
+          return `<div class="summary-item summary-hard">${renderItemIcon(item)}<span>${item.label}</span><span class="meta">正确率${accPct}% · 错${item.entry.wrong}次</span></div>`;
+        }).join('');
+
+    document.getElementById('mastered-words-list').innerHTML = masteredWords.length === 0
+      ? '<span class="empty-msg">还没有掌握的词，继续加油！</span>'
+      : masteredWords.slice(0, 50).map(item =>
+          `<div class="summary-item summary-mastered">${renderItemIcon(item)}<span>${item.label}</span><span class="meta">${item.levelIcon} 对${item.entry.correct}次</span></div>`
+        ).join('');
+    } // end renderAll
+
+    renderAll();
   </script>
 </body>
 </html>
