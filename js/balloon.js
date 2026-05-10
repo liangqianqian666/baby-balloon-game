@@ -13,9 +13,13 @@ function preloadLevelImages(levelKey) {
   const level = LEVELS[levelKey];
   if (!level) return Promise.resolve();
   const promises = level.items
-    .filter(item => item.display && item.display.startsWith('assets/'))
+    .filter(item => {
+      if (CONFIG.imageStyle === 'photo' && item.photo) return true;
+      return item.display && item.display.startsWith('assets/');
+    })
     .map(item => new Promise(resolve => {
-      const img = preloadImage(item.display);
+      const src = (CONFIG.imageStyle === 'photo' && item.photo) ? item.photo : item.display;
+      const img = preloadImage(src);
       if (img.complete) resolve();
       else { img.onload = resolve; img.onerror = resolve; }
     }));
@@ -58,10 +62,14 @@ class Balloon {
     this._img = null;
     this._useEmoji = false;
 
-    if (CONFIG.imageStyle === 'photo' && this.item.emoji) {
-      // 照片/实物模式：用 emoji 渲染
+    if (CONFIG.imageStyle === 'photo' && this.item.photo) {
+      // 实物照片模式
+      this._img = preloadImage(this.item.photo);
+    } else if (CONFIG.imageStyle === 'emoji' && this.item.emoji) {
+      // Emoji 模式
       this._useEmoji = true;
     } else if (this.item.display && this.item.display.startsWith('assets/')) {
+      // 手绘 SVG 模式（默认）
       this._img = preloadImage(this.item.display);
     }
   }

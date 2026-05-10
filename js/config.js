@@ -35,6 +35,6 @@ const CONFIG = {
   // 背景模式: 'none' = 纯摄像头无背景, 'transparent' = 半透明童趣背景
   backgroundMode: 'none',
 
-  // 图片风格: 'svg' = 手绘SVG, 'photo' = 实物照片
+  // 图片风格: 'svg' = 手绘SVG, 'photo' = 实物照片, 'emoji' = Emoji
   imageStyle: 'photo',
 };
