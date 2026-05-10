@@ -17,7 +17,7 @@ class Game {
     // 关卡
     this.level = null;
     this.levelItems = [];
-    this.starsToWin = 20; // 得到20颗星通关
+    this.starsToWin = CONFIG.starsToWin;
 
     // 自适应身高：追踪孩子的活动范围
     this.bodyZone = null; // { topY, bottomY, leftX, rightX } 屏幕坐标
@@ -187,6 +187,7 @@ class Game {
     this.levelItems = this.level.items;
     this.score = 0;
     this.streak = 0;
+    this.starsToWin = CONFIG.starsToWin; // 每次开局刷新
     document.getElementById('score').textContent = '0';
     this.startRound();
   }
@@ -335,13 +336,16 @@ class Game {
 
   onWrong(balloon) {
     if (balloon.shaking) return;
+    if (this._speaking) return; // 语音播报中不触发
+
     balloon.shake();
     this.streak = 0;
     LearningTracker.record(this.levelKey, balloon.item.id, false);
     Analytics.track('wrong', { level: this.levelKey, item: balloon.item.id, target: this.targetItem.id });
     AudioManager.playWrong();
-    const wrongText = this.level.wrongSay(balloon.item, this.targetItem);
-    AudioManager.speakGeneric(wrongText);
+    this._speaking = true;
+    const wrongText = 'No! ' + this.level.wrongSay(balloon.item, this.targetItem);
+    AudioManager.speakGeneric(wrongText, () => { this._speaking = false; });
   }
 
   spawnConfetti(x, y) {
