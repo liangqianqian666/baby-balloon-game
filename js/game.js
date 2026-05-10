@@ -168,21 +168,34 @@ class Game {
     this.starRain.forEach(s => { s.y += s.vy; s.x += s.vx; s.vy += 0.08; s.rotation += 0.05; s.life -= 0.008; });
     this.starRain = this.starRain.filter(s => s.life > 0);
 
-    // 碰撞检测
+    // 碰撞检测（需要停留才触发）
     if (this.state === 'playing') {
       const hands = this.handCursor.getActivePositions();
-      for (const hand of hands) {
-        for (const balloon of this.balloons) {
-          if (balloon.popping) continue;
-          if (balloon.fadeIn !== undefined && balloon.fadeIn < 0.8) continue;
+      for (const balloon of this.balloons) {
+        if (balloon.popping) continue;
+        if (balloon.fadeIn !== undefined && balloon.fadeIn < 0.8) continue;
+
+        let touching = false;
+        for (const hand of hands) {
           if (balloon.hitTest(hand.x, hand.y)) {
+            touching = true;
+            break;
+          }
+        }
+
+        if (touching) {
+          balloon.dwellTime++;
+          if (balloon.dwellTime >= balloon.dwellThreshold) {
             if (balloon.item.id === this.targetItem.id) {
               this.onCorrect(balloon);
             } else {
               this.onWrong(balloon);
             }
+            balloon.dwellTime = 0;
             break;
           }
+        } else {
+          balloon.dwellTime = 0;
         }
       }
     }

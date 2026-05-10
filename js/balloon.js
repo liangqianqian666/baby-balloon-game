@@ -46,6 +46,8 @@ class Balloon {
     this.breathSpeed = 0.03 + Math.random() * 0.01;
     this.slot = 0;
     this.fadeIn = 0;
+    this.dwellTime = 0;      // 手停留在气球上的帧数
+    this.dwellThreshold = 12; // 需要停留约 200ms（~12帧@60fps）才算触碰
 
     // 预加载图片
     if (this.item.display && this.item.display.startsWith('assets/')) {
@@ -120,9 +122,20 @@ class Balloon {
       drawX += Math.sin(this.shakeTime * 1.5) * 5;
     }
 
-    // 呼吸缩放
+    // 呼吸缩放 + 手悬停放大
     const breathScale = 1 + Math.sin(time * this.breathSpeed + this.breathOffset) * 0.04;
-    const r = this.radius * breathScale;
+    const dwellScale = this.dwellTime > 0 ? 1 + (this.dwellTime / this.dwellThreshold) * 0.15 : 1;
+    const r = this.radius * breathScale * dwellScale;
+
+    // 悬停光圈
+    if (this.dwellTime > 0 && !this.shaking) {
+      const progress = this.dwellTime / this.dwellThreshold;
+      ctx.strokeStyle = `rgba(255, 215, 0, ${progress * 0.8})`;
+      ctx.lineWidth = 4 + progress * 4;
+      ctx.beginPath();
+      ctx.arc(drawX, this.y, r * 1.15 + 6, -Math.PI / 2, -Math.PI / 2 + progress * Math.PI * 2);
+      ctx.stroke();
+    }
 
     if (!this.item.display) {
       // === 颜色模式：画气球 ===
