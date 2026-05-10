@@ -128,17 +128,17 @@ body {
 .level-due {
   position: absolute;
   top: 4px;
-  right: 6px;
-  font-size: 11px;
+  right: 4px;
+  font-size: 9px;
   background: #FF6B6B;
   color: white;
-  border-radius: 50%;
-  width: 18px;
-  height: 18px;
+  border-radius: 8px;
+  padding: 1px 5px;
   display: flex;
   align-items: center;
   justify-content: center;
   font-weight: bold;
+  white-space: nowrap;
 }
 
 .level-btn {
@@ -178,6 +178,7 @@ body {
   text-shadow: 2px 2px 0 rgba(0,0,0,0.2);
   z-index: 10;
   display: none;
+  visibility: hidden; /* 由canvas星星瓶子替代 */
 }
 
 /* 角色选择按钮 */

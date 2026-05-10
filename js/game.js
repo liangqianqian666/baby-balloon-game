@@ -26,6 +26,9 @@ class Game {
     this.hintLevel = 0;       // 提示等级 0=无 1=轻提示 2=强提示
     this.celebEmojis = [];    // 答对后飘出的大表情
 
+    // 星星瓶子（进度可视化）
+    this.jarBubbles = [];     // 瓶中气泡
+
     // 关卡
     this.level = null;
     this.levelItems = [];
@@ -87,7 +90,8 @@ class Game {
     this.levelItems = this.level.items;
     this.score = 0;
     this.streak = 0;
-    this.starsToWin = CONFIG.starsToWin; // 每次开局刷新
+    this.starsToWin = CONFIG.starsToWin;
+    this.jarBubbles = [];
     document.getElementById('score').textContent = '0';
     this.startRound();
   }
@@ -177,6 +181,11 @@ class Game {
     this.celebEmojis.forEach(e => { e.y -= 1.5; e.life -= 0.015; e.scale += 0.005; });
     this.celebEmojis = this.celebEmojis.filter(e => e.life > 0);
 
+    // 更新星星瓶子
+    // 瓶中气泡
+    this.jarBubbles.forEach(b => { b.y -= 0.3; b.life -= 0.01; b.x += Math.sin(this.time * 0.05 + b.offset) * 0.3; });
+    this.jarBubbles = this.jarBubbles.filter(b => b.life > 0);
+
     // 找不到提示计时
     if (this.state === 'playing') {
       this.hintTimer++;
@@ -231,6 +240,9 @@ class Game {
     this.score++;
     document.getElementById('score').textContent = this.score;
     this.state = 'transition';
+
+    // 更新星星瓶子
+    this._addJarBubbles();
 
     AudioManager.playPop();
     setTimeout(() => AudioManager.playCheer(), 150);
@@ -388,6 +400,133 @@ class Game {
     }, 1500);
   }
 
+  // === 星星瓶子 ===
+
+  _addJarBubbles() {
+    // 答对时在瓶中冒几个气泡
+    for (let i = 0; i < 3; i++) {
+      this.jarBubbles.push({
+        x: 40 + Math.random() * 30,
+        y: 260 - Math.random() * 30,
+        size: 2 + Math.random() * 4,
+        life: 1,
+        offset: Math.random() * Math.PI * 2,
+      });
+    }
+  }
+
+  _drawStarJar(ctx) {
+    const total = this.starsToWin;
+    const filled = this.score;
+
+    // 瓶子位置和尺寸
+    const jarX = 20;       // 左边距
+    const jarTopY = 70;    // 瓶口
+    const jarW = 60;       // 宽度
+    const jarH = 220;      // 高度
+    const jarBottomY = jarTopY + jarH;
+    const cornerR = 12;
+
+    // 瓶口
+    ctx.save();
+    ctx.fillStyle = 'rgba(255,255,255,0.3)';
+    ctx.strokeStyle = 'rgba(255,255,255,0.6)';
+    ctx.lineWidth = 3;
+
+    // 瓶身（圆角矩形）
+    const bx = jarX, by = jarTopY, bw = jarW, bh = jarH;
+    ctx.beginPath();
+    ctx.moveTo(bx + cornerR, by);
+    ctx.lineTo(bx + bw - cornerR, by);
+    ctx.quadraticCurveTo(bx + bw, by, bx + bw, by + cornerR);
+    ctx.lineTo(bx + bw, by + bh - cornerR);
+    ctx.quadraticCurveTo(bx + bw, by + bh, bx + bw - cornerR, by + bh);
+    ctx.lineTo(bx + cornerR, by + bh);
+    ctx.quadraticCurveTo(bx, by + bh, bx, by + bh - cornerR);
+    ctx.lineTo(bx, by + cornerR);
+    ctx.quadraticCurveTo(bx, by, bx + cornerR, by);
+    ctx.closePath();
+    ctx.fill();
+    ctx.stroke();
+
+    // 星星网格：从下往上排列
+    const cols = 3;
+    const starSize = 16;
+    const padX = (jarW - cols * starSize) / (cols + 1);
+    const padY = 4;
+    const rows = Math.ceil(total / cols);
+
+    for (let i = 0; i < total; i++) {
+      const row = Math.floor(i / cols);
+      const col = i % cols;
+      const sx = jarX + padX + col * (starSize + padX) + starSize / 2;
+      // 从底部往上排
+      const sy = jarBottomY - cornerR - padY - (row + 0.5) * (starSize + padY);
+
+      const isLit = i < filled;
+      const wobble = isLit ? Math.sin(this.time * 0.05 + i) * 1.5 : 0;
+
+      ctx.font = `${starSize}px Arial`;
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+
+      if (isLit) {
+        // 金色星星 — 带发光
+        ctx.shadowColor = '#FFD700';
+        ctx.shadowBlur = 8;
+        ctx.fillText('⭐', sx, sy + wobble);
+        ctx.shadowBlur = 0;
+      } else {
+        // 灰色星星
+        ctx.globalAlpha = 0.3;
+        ctx.fillText('⭐', sx, sy);
+        ctx.globalAlpha = 1;
+      }
+    }
+
+    // 瓶中气泡
+    this.jarBubbles.forEach(b => {
+      ctx.globalAlpha = b.life * 0.5;
+      ctx.fillStyle = '#FFD700';
+      ctx.beginPath();
+      ctx.arc(b.x, b.y, b.size, 0, Math.PI * 2);
+      ctx.fill();
+    });
+    ctx.globalAlpha = 1;
+
+    // 进度数字
+    ctx.font = 'bold 18px Arial Rounded MT Bold, Nunito, Arial';
+    ctx.textAlign = 'center';
+    ctx.fillStyle = '#FFD700';
+    ctx.shadowColor = 'rgba(0,0,0,0.5)';
+    ctx.shadowBlur = 4;
+    ctx.fillText(`${filled}/${total}`, jarX + jarW / 2, jarBottomY + 20);
+    ctx.shadowBlur = 0;
+
+    // 满瓶闪光
+    if (filled >= total) {
+      const glow = Math.sin(this.time * 0.1) * 0.2 + 0.3;
+      ctx.globalAlpha = glow;
+      ctx.strokeStyle = '#FFD700';
+      ctx.lineWidth = 4;
+      ctx.beginPath();
+      ctx.moveTo(bx + cornerR, by);
+      ctx.lineTo(bx + bw - cornerR, by);
+      ctx.quadraticCurveTo(bx + bw, by, bx + bw, by + cornerR);
+      ctx.lineTo(bx + bw, by + bh - cornerR);
+      ctx.quadraticCurveTo(bx + bw, by + bh, bx + bw - cornerR, by + bh);
+      ctx.lineTo(bx + cornerR, by + bh);
+      ctx.quadraticCurveTo(bx, by + bh, bx, by + bh - cornerR);
+      ctx.lineTo(bx, by + cornerR);
+      ctx.quadraticCurveTo(bx, by, bx + cornerR, by);
+      ctx.closePath();
+      ctx.stroke();
+      ctx.globalAlpha = 1;
+    }
+
+    ctx.restore();
+  }
+
   // === 正向刺激特效 ===
 
   _triggerStreakEffects(x, y) {
@@ -444,12 +583,12 @@ class Game {
   }
 
   _spawnFlyingStar(x, y) {
-    // 飞向左上角计分板
+    // 飞向左上角星星瓶子开口
     for (let i = 0; i < 3; i++) {
       this.flyingStars.push({
         x: x + (Math.random() - 0.5) * 40,
         y: y + (Math.random() - 0.5) * 40,
-        tx: 60, ty: 40, // 计分板位置
+        tx: 55, ty: 80, // 瓶口位置
         life: 1,
         scale: 1,
         size: 16 + Math.random() * 10,
@@ -612,6 +751,9 @@ class Game {
         ctx.globalAlpha = 1;
       }
     }
+
+    // 星星瓶子
+    this._drawStarJar(ctx);
 
     // 气球（支持淡入 + 提示闪烁）
     this.balloons.forEach(b => {
