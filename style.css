@@ -78,11 +78,37 @@ body {
 
 #level-buttons {
   display: flex;
+  flex-direction: column;
+  gap: 8px;
+  max-width: 900px;
+  padding: 0 20px;
+}
+
+.level-category-header {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  margin-top: 8px;
+  margin-bottom: 4px;
+  padding-left: 4px;
+}
+
+.cat-name {
+  font-size: 20px;
+  font-weight: bold;
+  color: #555;
+}
+
+.cat-desc {
+  font-size: 14px;
+  color: #999;
+}
+
+.level-grid {
+  display: flex;
   flex-wrap: wrap;
   gap: 16px;
   justify-content: center;
-  max-width: 900px;
-  padding: 0 20px;
 }
 
 .level-btn {
