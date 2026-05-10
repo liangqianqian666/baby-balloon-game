@@ -379,10 +379,10 @@ class Game {
     const en = this.targetItem.id;
     const cn = cnMap[en];
     if (cn) {
-      hint.innerHTML = `${this.targetItem.label}<br><span style="font-size:28px;color:#555">小朋友，${en} 就是${cn}哦！找找看 👆</span>`;
-      AudioManager.speakGeneric(`${en}! Find the ${en}!`);
+      hint.innerHTML = `${this.targetItem.label}<br><span style="font-size:28px;color:#555">👆 Find the ${en}! 👆</span>`;
+      AudioManager.speakGeneric(`${en}! It means ${cn}! Find the ${en}!`);
     } else {
-      hint.innerHTML = `${this.targetItem.label}<br><span style="font-size:28px;color:#555">找这个！👆</span>`;
+      hint.innerHTML = `${this.targetItem.label}<br><span style="font-size:28px;color:#555">👆 Find the ${en}! 👆</span>`;
       AudioManager.speakGeneric(`Find the ${en}!`);
     }
   }
@@ -567,28 +567,22 @@ class Game {
       this.screenFlashColor = '#FF6BB5';
     }
 
-    // 连击提示文字
+    // 连击提示：纯语音+emoji，不显示中文文字
     if (this.streak >= 2) {
-      const streakMessages = {
-        2: ['连对2个啦！👏', '厉害！2个了！', '真棒！继续！'],
-        3: ['哇！连对3个了！🎉', '3连击！太厉害了！', '宝宝好聪明！3个了！'],
-        4: ['4个了！停不下来！🔥', '天哪！4连击！', '太牛了！4个了！'],
-        5: ['5连击！超级厉害！🌟', '哇哦！5个了！无敌！', '5连击！宝宝是天才！'],
-      };
-      const defaultMsgs = ['太强了！停不下来！🚀', '无人能挡！继续冲！💫', '宝宝无敌了！🏆'];
-      const msgs = streakMessages[this.streak] || defaultMsgs;
-      this.comboText = msgs[Math.floor(Math.random() * msgs.length)];
-      this.comboTextTimer = 80; // ~1.3秒
+      const emojis = ['⭐', '🌟', '💫', '🔥', '🚀', '🏆'];
+      const emojiIdx = Math.min(this.streak - 2, emojis.length - 1);
+      this.comboText = `${emojis[emojiIdx]} ${this.streak}x ${emojis[emojiIdx]}`;
+      this.comboTextTimer = 80;
 
-      // 语音鼓励（中文穿插英文）
+      // 语音鼓励（中文语音，孩子听得懂）
       if (this.streak === 3) {
-        this._speakStreakCheer('Wow! Three in a row!');
+        this._speakStreakCheer('You did it! Three in a row!');
       } else if (this.streak === 5) {
-        this._speakStreakCheer('Five in a row! You are a superstar!');
+        this._speakStreakCheer('Five in a row! Can you keep going?');
       } else if (this.streak === 7) {
-        this._speakStreakCheer('Seven! Incredible! Can you keep going?');
+        this._speakStreakCheer('Seven in a row! Wow!');
       } else if (this.streak === 10) {
-        this._speakStreakCheer('Ten in a row! You are amazing!');
+        this._speakStreakCheer('Ten in a row! That is a lot!');
       }
     }
   }
