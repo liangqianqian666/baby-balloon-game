@@ -260,6 +260,7 @@ class Game {
     // 立即说单词
     this.streak++;
     this._triggerStreakEffects(balloon.x, balloon.y);
+    this.handCursor.setStreakLevel(this.streak);
     const word = this.level.correctSay(balloon.item);
     AudioManager.speakColor(word, () => {
       AudioManager.speakPraise(this.streak, () => {
@@ -304,6 +305,7 @@ class Game {
 
     balloon.shake();
     this.streak = 0;
+    this.handCursor.downgrade(); // 答错降一级特效，不直接清零
     LearningTracker.record(this.levelKey, balloon.item.id, false);
     Analytics.track('wrong', { level: this.levelKey, item: balloon.item.id, target: this.targetItem.id });
     AudioManager.playWrong();
