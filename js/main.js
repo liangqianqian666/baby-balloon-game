@@ -38,6 +38,12 @@ window.addEventListener('DOMContentLoaded', () => {
     CONFIG.backgroundMode = savedBgMode;
   }
 
+  // 从 localStorage 恢复图片风格
+  const savedStyle = localStorage.getItem('imageStyle');
+  if (savedStyle && ['svg', 'photo'].includes(savedStyle)) {
+    CONFIG.imageStyle = savedStyle;
+  }
+
   // 从 localStorage 恢复通关星星数
   const savedStars = localStorage.getItem('starsToWin');
   if (savedStars) {
@@ -46,6 +52,7 @@ window.addEventListener('DOMContentLoaded', () => {
 
   initProfileSelector();
   initBgToggle();
+  initStyleToggle();
   initStarsToggle();
   initKeyboardNav();
   showLevelSelect();
@@ -255,6 +262,20 @@ function initBgToggle() {
       btn.classList.add('active');
       CONFIG.backgroundMode = btn.dataset.mode;
       localStorage.setItem('backgroundMode', btn.dataset.mode);
+    });
+  });
+}
+
+// 图片风格切换
+function initStyleToggle() {
+  const btns = document.querySelectorAll('.style-btn');
+  btns.forEach(btn => {
+    if (btn.dataset.style === CONFIG.imageStyle) btn.classList.add('active');
+    btn.addEventListener('click', () => {
+      btns.forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      CONFIG.imageStyle = btn.dataset.style;
+      localStorage.setItem('imageStyle', btn.dataset.style);
     });
   });
 }

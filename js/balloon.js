@@ -49,8 +49,18 @@ class Balloon {
     this.dwellTime = 0;      // 手停留在气球上的帧数
     this.dwellThreshold = 12; // 需要停留约 200ms（~12帧@60fps）才算触碰
 
-    // 预加载图片
-    if (this.item.display && this.item.display.startsWith('assets/')) {
+    // 预加载图片（根据图片风格选择）
+    this._resolveDisplay();
+  }
+
+  _resolveDisplay() {
+    this._img = null;
+    this._useEmoji = false;
+
+    if (CONFIG.imageStyle === 'photo' && this.item.emoji) {
+      // 照片/实物模式：用 emoji 渲染
+      this._useEmoji = true;
+    } else if (this.item.display && this.item.display.startsWith('assets/')) {
       this._img = preloadImage(this.item.display);
     }
   }
@@ -137,7 +147,20 @@ class Balloon {
       ctx.stroke();
     }
 
-    if (!this.item.display) {
+    if (this._useEmoji) {
+      // === Emoji 实物模式 ===
+      ctx.fillStyle = 'rgba(255,255,255,0.85)';
+      ctx.beginPath();
+      ctx.arc(drawX, this.y, r * 1.1, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.strokeStyle = 'rgba(0,0,0,0.08)';
+      ctx.lineWidth = 2;
+      ctx.stroke();
+      ctx.font = `${r * 1.6}px Arial, sans-serif`;
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText(this.item.emoji, drawX, this.y);
+    } else if (!this.item.display) {
       // === 颜色模式：画气球 ===
       const fillColor = this.item.color;
       const lightColor = this.item.lightColor;
