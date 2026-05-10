@@ -378,6 +378,14 @@ class Game {
     }
   }
 
+  // === 连击语音鼓励（延迟说，不打断当前语音） ===
+
+  _speakStreakCheer(text) {
+    setTimeout(() => {
+      AudioManager.speakGeneric(text);
+    }, 1500);
+  }
+
   // === 正向刺激特效 ===
 
   _triggerStreakEffects(x, y) {
@@ -409,11 +417,27 @@ class Game {
 
     // 连击提示文字
     if (this.streak >= 2) {
-      const combos = ['Combo!', 'Wow!', 'Cool!', 'Yeah!', 'Go go go!'];
-      this.comboText = this.streak >= 5
-        ? `🌟 ${this.streak}x ${combos[Math.floor(Math.random() * combos.length)]} 🌟`
-        : `⭐ ${this.streak}x ${combos[Math.floor(Math.random() * combos.length)]}`;
-      this.comboTextTimer = 60; // ~1秒
+      const streakMessages = {
+        2: ['连对2个啦！👏', '厉害！2个了！', '真棒！继续！'],
+        3: ['哇！连对3个了！🎉', '3连击！太厉害了！', '宝宝好聪明！3个了！'],
+        4: ['4个了！停不下来！🔥', '天哪！4连击！', '太牛了！4个了！'],
+        5: ['5连击！超级厉害！🌟', '哇哦！5个了！无敌！', '5连击！宝宝是天才！'],
+      };
+      const defaultMsgs = ['太强了！停不下来！🚀', '无人能挡！继续冲！💫', '宝宝无敌了！🏆'];
+      const msgs = streakMessages[this.streak] || defaultMsgs;
+      this.comboText = msgs[Math.floor(Math.random() * msgs.length)];
+      this.comboTextTimer = 80; // ~1.3秒
+
+      // 语音鼓励（中文穿插英文）
+      if (this.streak === 3) {
+        this._speakStreakCheer('Wow! Three in a row!');
+      } else if (this.streak === 5) {
+        this._speakStreakCheer('Five in a row! You are a superstar!');
+      } else if (this.streak === 7) {
+        this._speakStreakCheer('Seven! Incredible! Can you keep going?');
+      } else if (this.streak === 10) {
+        this._speakStreakCheer('Ten in a row! You are amazing!');
+      }
     }
   }
 
