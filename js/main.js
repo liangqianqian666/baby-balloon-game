@@ -49,6 +49,16 @@ window.addEventListener('DOMContentLoaded', () => {
   initStarsToggle();
   initKeyboardNav();
   showLevelSelect();
+
+  // 游戏中按钮
+  document.getElementById('btn-back').addEventListener('click', () => showLevelSelect());
+  document.getElementById('btn-skip').addEventListener('click', () => {
+    // 随机选一个不同的关卡
+    const keys = Object.keys(LEVELS);
+    const others = keys.filter(k => k !== (game && game.levelKey));
+    const next = others[Math.floor(Math.random() * others.length)];
+    startGame(next);
+  });
 });
 
 function showLevelSelect() {
@@ -56,6 +66,7 @@ function showLevelSelect() {
   document.getElementById('game-canvas').style.display = 'none';
   document.getElementById('score-display').style.display = 'none';
   document.getElementById('color-hint').style.display = 'none';
+  document.getElementById('game-buttons').style.display = 'none';
 
   const container = document.getElementById('level-buttons');
   container.innerHTML = '';
@@ -71,7 +82,7 @@ function showLevelSelect() {
     if (progress && progress.mastered === progress.total) {
       progressDot = '<span class="level-complete">✓</span>';
     } else if (progress && progress.reviewDue > 0) {
-      progressDot = `<span class="level-due">${progress.reviewDue}</span>`;
+      progressDot = `<span class="level-due" title="${progress.reviewDue}个词需要复习">复习${progress.reviewDue}</span>`;
     }
 
     btn.innerHTML = `<span class="level-icon">${level.icon}</span><span class="level-name">${level.name}</span>${progressDot}`;
@@ -84,6 +95,7 @@ async function startGame(levelKey) {
   document.getElementById('level-screen').style.display = 'none';
   document.getElementById('game-canvas').style.display = 'block';
   document.getElementById('score-display').style.display = 'block';
+  document.getElementById('game-buttons').style.display = 'flex';
 
   // 预加载图片
   await preloadLevelImages(levelKey);
