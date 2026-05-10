@@ -28,11 +28,7 @@ class Game {
     this.levelItems = [];
     this.starsToWin = CONFIG.starsToWin;
 
-    // 自适应身高：追踪孩子的活动范围
-    this.bodyZone = null; // { topY, bottomY, leftX, rightX } 屏幕坐标
-    this._bodySmoothing = 0.05; // 平滑系数，慢慢跟随
-    this._calibrated = false;
-
+    // 自适应（已禁用跟随）
     this.resize();
     window.addEventListener('resize', () => this.resize());
   }
@@ -42,125 +38,17 @@ class Game {
     this.canvas.height = window.innerHeight;
   }
 
-  // 根据 MoveNet 关键点更新孩子的活动区域
-  // keypoints 索引: 0=nose, 5=leftShoulder, 6=rightShoulder, 9=leftWrist, 10=rightWrist
-  updateBodyZone(keypoints, videoW, videoH) {
-    if (!keypoints || keypoints.length < 13) return;
-
-    const w = this.canvas.width;
-    const h = this.canvas.height;
-    const minConf = 0.3;
-
-    const nose = keypoints[0];
-    const leftShoulder = keypoints[5];
-    const rightShoulder = keypoints[6];
-
-    if ((!nose || nose.score < minConf) &&
-        (!leftShoulder || leftShoulder.score < minConf) &&
-        (!rightShoulder || rightShoulder.score < minConf)) return;
-
-    const mapX = (kp) => (1 - kp.x / videoW) * w;
-    const mapY = (kp) => (kp.y / videoH) * h;
-
-    let headTopY = h * 0.15;
-    if (nose && nose.score >= minConf) {
-      const noseY = mapY(nose);
-      let headHeight = h * 0.08;
-      if (leftShoulder && rightShoulder &&
-          leftShoulder.score >= minConf && rightShoulder.score >= minConf) {
-        headHeight = Math.abs(mapX(leftShoulder) - mapX(rightShoulder)) * 0.7;
-      }
-      headTopY = noseY - headHeight;
-    }
-
-    let armReach = h * 0.15;
-    if (leftShoulder && rightShoulder &&
-        leftShoulder.score >= minConf && rightShoulder.score >= minConf) {
-      armReach = Math.abs(mapX(leftShoulder) - mapX(rightShoulder)) * 1.5;
-    }
-    const reachTopY = Math.max(30, headTopY - armReach * 0.3);
-
-    let centerX = w / 2;
-    if (leftShoulder && rightShoulder &&
-        leftShoulder.score >= minConf && rightShoulder.score >= minConf) {
-      centerX = (mapX(leftShoulder) + mapX(rightShoulder)) / 2;
-    } else if (nose && nose.score >= minConf) {
-      centerX = mapX(nose);
-    }
-    const reachLeftX = Math.max(70, centerX - armReach * 1.5);
-    const reachRightX = Math.min(w - 70, centerX + armReach * 1.5);
-
-    let shoulderY = h * 0.5;
-    if (leftShoulder && leftShoulder.score >= minConf) {
-      shoulderY = mapY(leftShoulder);
-    } else if (rightShoulder && rightShoulder.score >= minConf) {
-      shoulderY = mapY(rightShoulder);
-    }
-    const reachBottomY = shoulderY - armReach * 0.1;
-
-    const target = {
-      topY: reachTopY,
-      bottomY: reachBottomY,
-      leftX: reachLeftX,
-      rightX: reachRightX,
-      centerX: centerX,
-    };
-
-    if (!this.bodyZone) {
-      this.bodyZone = target;
-      this._calibrated = true;
-    } else {
-      const s = this._bodySmoothing;
-      this.bodyZone.topY += (target.topY - this.bodyZone.topY) * s;
-      this.bodyZone.bottomY += (target.bottomY - this.bodyZone.bottomY) * s;
-      this.bodyZone.leftX += (target.leftX - this.bodyZone.leftX) * s;
-      this.bodyZone.rightX += (target.rightX - this.bodyZone.rightX) * s;
-      this.bodyZone.centerX += (target.centerX - this.bodyZone.centerX) * s;
-    }
-
-    this._repositionBalloons();
-  }
-
-  _repositionBalloons() {
-    if (!this.bodyZone) return;
-    this.balloons.forEach(b => {
-      if (b.popping) return;
-      const pos = this._getCirclePosition(b.slot, this.balloonCount);
-      // 缓慢移动到新位置
-      b.homeX += (pos.x - b.homeX) * 0.03;
-      b.homeY += (pos.y - b.homeY) * 0.03;
-    });
-  }
-
-  // 半圆分布，自适应孩子活动区域
+  // 固定四个位置：左、左上、右上、右
   _getCirclePosition(index, total) {
     const w = this.canvas.width;
     const h = this.canvas.height;
-
-    let centerX, centerY, radiusX, radiusY;
-
-    if (this.bodyZone) {
-      // 根据孩子身体位置动态计算
-      centerX = this.bodyZone.centerX;
-      centerY = this.bodyZone.bottomY;
-      radiusX = (this.bodyZone.rightX - this.bodyZone.leftX) / 2;
-      radiusY = (this.bodyZone.bottomY - this.bodyZone.topY) * 0.85;
-    } else {
-      // 默认位置
-      centerX = w / 2;
-      centerY = h * 0.45;
-      radiusX = Math.min(w * 0.4, 450);
-      radiusY = Math.min(h * 0.32, 280);
-    }
-
-    // 从左到右的浅弧
-    const arcStart = Math.PI * 0.86;
-    const arcEnd = Math.PI * 0.14;
-    const arcRange = arcStart - arcEnd;
-    const angle = arcStart - (arcRange / (total - 1)) * index;
-    const x = centerX + Math.cos(angle) * radiusX;
-    const y = centerY - Math.sin(angle) * radiusY;
-    return { x, y };
+    const positions = [
+      { x: w * 0.12, y: h * 0.45 },  // 左
+      { x: w * 0.37, y: h * 0.22 },  // 左上
+      { x: w * 0.63, y: h * 0.22 },  // 右上
+      { x: w * 0.88, y: h * 0.45 },  // 右
+    ];
+    return positions[index % positions.length];
   }
 
   // 找一个空的位置 slot
@@ -235,13 +123,6 @@ class Game {
     const handsLandmarks = Camera.detectHands();
     if (handsLandmarks) {
       this.handCursor.update(handsLandmarks, this.canvas.width, this.canvas.height);
-    }
-
-    // MoveNet → 身体姿态 → 气球布局
-    const keypoints = await Camera.detectPose();
-    if (keypoints) {
-      const vs = Camera.getVideoSize();
-      this.updateBodyZone(keypoints, vs.width, vs.height);
     }
 
     // 更新气球
