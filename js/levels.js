@@ -22,7 +22,7 @@ const LEVELS = {
   },
 
   numbers: {
-    name: 'Numbers',
+    name: '1-10',
     icon: '🔢',
     items: [
       { id: 'one',      label: '1',  color: '#FF6B6B', lightColor: '#FF9999', display: '1' },
@@ -35,6 +35,16 @@ const LEVELS = {
       { id: 'eight',    label: '8',  color: '#F39C12', lightColor: '#F7C06B', display: '8' },
       { id: 'nine',     label: '9',  color: '#1ABC9C', lightColor: '#76D7C4', display: '9' },
       { id: 'ten',      label: '10', color: '#E74C3C', lightColor: '#F1948A', display: '10' },
+    ],
+    prompt: (item) => `Find number ${item.display}!`,
+    correctSay: (item) => item.id,
+    wrongSay: (item, target) => `That's ${item.id}. Find ${target.id}!`,
+  },
+
+  numbers2: {
+    name: '11-20',
+    icon: '🔟',
+    items: [
       { id: 'eleven',   label: '11', color: '#8E44AD', lightColor: '#AF7AC5', display: '11' },
       { id: 'twelve',   label: '12', color: '#2ECC71', lightColor: '#82E0AA', display: '12' },
       { id: 'thirteen', label: '13', color: '#E67E22', lightColor: '#F0B27A', display: '13' },

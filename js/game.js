@@ -335,6 +335,8 @@ class Game {
       orange:'橙色', pink:'粉色', white:'白色', black:'黑色', brown:'棕色',
       one:'1', two:'2', three:'3', four:'4', five:'5', six:'6', seven:'7',
       eight:'8', nine:'9', ten:'10', eleven:'11', twelve:'12',
+      thirteen:'13', fourteen:'14', fifteen:'15', sixteen:'16',
+      seventeen:'17', eighteen:'18', nineteen:'19', twenty:'20',
       circle:'圆形', square:'正方形', triangle:'三角形', star:'星形',
       heart:'心形', diamond:'菱形', rectangle:'长方形', oval:'椭圆',
       apple:'苹果', banana:'香蕉', grape:'葡萄', watermelon:'西瓜',
