@@ -10,7 +10,7 @@ baby-balloon-game/
 ├── js/            # 全局变量模块，靠 index.html <script> 顺序串联（无打包）
 │   ├── config.js → levels.js → spaced-rep.js      # 配置 → 数据 → 算法
 │   ├── balloon.js / hand-cursor.js / camera.js / audio.js  # 实体与设备
-│   ├── game.js    # Game 类：主循环 + 碰撞 + 特效 + 渲染
+│   ├── game.js    # GameState 状态机 + Game 类（主循环/碰撞/特效/渲染）
 │   └── main.js    # 入口胶水 + UI + 角色管理
 └── assets/        # images/ 按专题 SVG+照片 · voices/ 预录 mp3
 ```
@@ -18,24 +18,24 @@ baby-balloon-game/
 ## 文件职责表
 | 文件 | 行数 | 职责 | 全局导出 |
 |---|---|---|---|
-| config.js | 40 | 配比/阈值/遗忘曲线常量 | `CONFIG` |
+| config.js | 78 | 全部可调参数（玩法/提示/连击/特效/星星瓶/星星范围） | `CONFIG` |
 | levels.js | 439 | 14 专题词汇 + prompt/correctSay/wrongSay 模板 | `LEVELS` `LEVEL_CATEGORIES` |
 | spaced-rep.js | 234 | 记录/掌握度/遗忘权重选题 | `SpacedRep` |
-| game.js | 823 | 状态、碰撞、9 种粒子特效、星星瓶、背景渲染 | `Game` |
-| balloon.js | 283 | 气球实体 + 全局图片缓存/预载 | `Balloon` `_imageCache` |
+| game.js | 845 | 状态机校验、碰撞、9 种粒子特效、星星瓶、背景渲染 | `GameState` `Game` |
+| balloon.js | 284 | 气球实体 + 全局图片缓存/预载 | `Balloon` `_imageCache` |
 | hand-cursor.js | 169 | 手掌光标 + 连击光环拖尾 | `HandCursor` |
 | camera.js | 100 | 摄像头 + MoveNet + MediaPipe Hands | `Camera` |
 | audio.js | 241 | TTS / 预录音 / WebAudio 合成音效 | `AudioManager` |
 | analytics.js | 106 | 本地埋点（30s 定时 + beforeunload 存档） | `Analytics` |
-| main.js | 472 | 初始化、关卡选择 UI、角色/设置、键盘导航 | `game` 等全局函数 |
+| main.js | 476 | 初始化、关卡选择 UI、角色/设置、键盘导航 | `game` 等全局函数 |
 
 ## 核心逻辑流
 1. 加载：`DOMContentLoaded` → 迁移旧数据/恢复角色与设置 → `showLevelSelect()`
 2. 开局：`startGame(key)` → 预载图片 → `new Game`（仅首次）→ `Camera.init` → rAF 主循环
-3. 每帧：`update()` 取手部 landmarks → 气球摆动 → 提示计时 → 停留命中检测（dwell≥12帧）
-4. 答对：`onCorrect` → pop + `SpacedRep.record(true)` → **语音回调链**结束才补气球+`pickTarget`
-5. 答错：`onWrong` → 抖动 + record(false) + `_speaking` 锁
-6. 通关：星星满 → `onLevelComplete` → 3.5s 后回首页（全局 `startNextLevel`）
+3. 状态机：`IDLE→PLAYING⇄TRANSITION→COMPLETE→IDLE`；一律走 `Game.setState`，非法转换拦截告警；`IDLE` 时 update() 暂停
+4. 每帧（非 IDLE）：手部 landmarks → 气球摆动 → 提示计时 → 停留命中检测（≥dwellThresholdFrames）
+5. 答对：`onCorrect`→TRANSITION → **语音回调链**结束才补气球 + `pickTarget`→PLAYING
+6. 答错：抖动 + streak 清零 + 语音锁，保持 PLAYING；通关：星满→COMPLETE→延迟回首页
 
 ## 数据流
 - 设置：`CONFIG` ← localStorage 覆盖（backgroundMode / imageStyle / starsToWin / currentProfile）
