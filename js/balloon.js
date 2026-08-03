@@ -9,7 +9,12 @@ function preloadImage(src) {
   _imageCache[src] = img;
   return img;
 }
+// 换关时清空旧关卡图片，防止缓存无限增长（浏览器 HTTP 缓存兜底，无重下成本）
+function clearImageCache() {
+  Object.keys(_imageCache).forEach(k => delete _imageCache[k]);
+}
 function preloadLevelImages(levelKey) {
+  clearImageCache();
   const level = LEVELS[levelKey];
   if (!level) return Promise.resolve();
   const promises = level.items
@@ -280,5 +285,12 @@ class Balloon {
     const dx = px - this.x;
     const dy = py - this.y;
     return (dx * dx + dy * dy) < (this.radius * this.radius * CONFIG.hitRadiusFactor);
+  }
+
+  // 显式销毁：被戳破后从游戏过滤时调用，主动释放引用
+  // （Image 对象本体由全局缓存管理，气球画布渲染无 DOM 节点需移除）
+  dispose() {
+    this._img = null;
+    this.particles = [];
   }
 }
