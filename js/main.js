@@ -1,6 +1,8 @@
 // main.js — 入口，初始化和 UI 胶水
 
 let game;
+let renderer;
+let rafId = null; // 主循环句柄：显式 start/stop，首页不空转
 let cameraAvailable = false;
 
 // 兼容旧代码：LearningTracker 指向 SpacedRep
@@ -28,6 +30,7 @@ window.addEventListener('DOMContentLoaded', () => {
     saveProfiles(profiles);
   }
 
+  UI.init(); // DOM 引用缓存，Game/Renderer 不再直接 getElementById
   AudioManager.init();
   SpacedRep.init();
   Analytics.init();
@@ -61,6 +64,7 @@ window.addEventListener('DOMContentLoaded', () => {
   document.getElementById('btn-back').addEventListener('click', () => {
     // 回首页先进 IDLE：暂停游戏更新，避免画布隐藏后仍持续消耗
     if (game) game.setState(GameState.IDLE);
+    stopLoop(); // 渲染循环同步停止
     showLevelSelect();
   });
   document.getElementById('btn-skip').addEventListener('click', () => {
@@ -70,6 +74,14 @@ window.addEventListener('DOMContentLoaded', () => {
     const next = others[Math.floor(Math.random() * others.length)];
     startGame(next);
   });
+});
+
+// 页面退出：显式拆除，不留定时器/监听/摄像头流
+window.addEventListener('pagehide', () => {
+  stopLoop();
+  if (game) game.destroy();
+  Camera.stop();
+  Analytics.flush();
 });
 
 function showLevelSelect() {
@@ -149,6 +161,7 @@ async function startGame(levelKey) {
 
   if (!game) {
     game = new Game(canvas);
+    renderer = new Renderer(game); // 渲染层：只读 game 状态绘制
 
     // 初始化摄像头
     try {
@@ -169,18 +182,30 @@ async function startGame(levelKey) {
         game.handCursor.leftHand.visible = true;
       });
     }
-
-    // 主循环
-    function loop() {
-      game.update();
-      game.draw();
-      requestAnimationFrame(loop);
-    }
-    requestAnimationFrame(loop);
   }
 
+  startLoop();
   game.setLevel(levelKey);
   Analytics.track('level_start', { level: levelKey });
+}
+
+// === 主循环生命周期：显式启停，首页/退出不空转 ===
+
+function loop() {
+  game.update();
+  renderer.draw();
+  rafId = requestAnimationFrame(loop);
+}
+
+function startLoop() {
+  if (rafId === null) rafId = requestAnimationFrame(loop);
+}
+
+function stopLoop() {
+  if (rafId !== null) {
+    cancelAnimationFrame(rafId);
+    rafId = null;
+  }
 }
 
 // === 角色管理 ===

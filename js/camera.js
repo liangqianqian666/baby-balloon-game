@@ -12,6 +12,7 @@ const Camera = {
   hands: null,
   _latestHands: null,
   handsReady: false,
+  _loopRunning: false, // hands 喂帧循环开关：stop() 时关闭
 
   async init() {
     this.video = document.getElementById('pose-video');
@@ -60,11 +61,12 @@ const Camera = {
     this.ready = true;
 
     // 持续发送帧给 Hands
+    this._loopRunning = true;
     this._handsLoop();
   },
 
   async _handsLoop() {
-    if (!this.handsReady || !this.hands) return;
+    if (!this._loopRunning || !this.handsReady || !this.hands) return;
     if (this.video.readyState >= 2) {
       try {
         await this.hands.send({ image: this.video });
@@ -96,5 +98,19 @@ const Camera = {
       width: this.video.videoWidth || 640,
       height: this.video.videoHeight || 480,
     };
-  }
+  },
+
+  // 显式停止：关闭喂帧循环、释放检测器、停摄像头流（页面退出时调用）
+  stop() {
+    this._loopRunning = false;
+    this.handsReady = false;
+    if (this.hands && this.hands.close) {
+      try { this.hands.close(); } catch (e) {}
+    }
+    if (this.video && this.video.srcObject) {
+      this.video.srcObject.getTracks().forEach(t => t.stop());
+      this.video.srcObject = null;
+    }
+    this.ready = false;
+  },
 };

@@ -23,6 +23,9 @@ class Game {
     this.score = 0;
     this.targetItem = null; // 当前目标 item
     this.state = GameState.IDLE; // 状态枚举见 GameState
+    this.roundId = 0;         // 回合代际：切换关卡自增，用于拦截过期语音回调
+    this._timers = new Set(); // 托管定时器：切关/回首页/销毁时统一清空
+    this._speaking = false;   // 语音播报锁
     this.time = 0;
     this.confetti = [];
     this.balloonCount = CONFIG.balloonCount;
@@ -50,7 +53,8 @@ class Game {
 
     // 自适应（已禁用跟随）
     this.resize();
-    window.addEventListener('resize', () => this.resize());
+    this._onResize = () => this.resize(); // 保存引用，destroy 时解绑
+    window.addEventListener('resize', this._onResize);
   }
 
   resize() {
@@ -66,6 +70,38 @@ class Game {
       return;
     }
     this.state = next;
+    // 回首页：清空全部挂起定时器与语音，避免污染下一局
+    if (next === GameState.IDLE) {
+      this._clearTimers();
+      AudioManager.stopSpeech();
+      this._speaking = false;
+    }
+  }
+
+  // 托管定时器：回合切换/销毁时统一清空，杜绝残留回调
+  _setTimeout(fn, ms) {
+    const id = setTimeout(() => {
+      this._timers.delete(id);
+      fn();
+    }, ms);
+    this._timers.add(id);
+    return id;
+  }
+
+  _clearTimers() {
+    this._timers.forEach(id => clearTimeout(id));
+    this._timers.clear();
+  }
+
+  // 显式销毁：页面退出时调用，释放监听/定时器/引用
+  destroy() {
+    this._clearTimers();
+    AudioManager.stopSpeech();
+    window.removeEventListener('resize', this._onResize);
+    this.balloons.forEach(b => b.dispose());
+    this.balloons = [];
+    this.handCursor.trail = [];
+    this.state = GameState.IDLE; // 拆除出口，不走转换表
   }
 
   // 固定四个位置：左、左上、右上、右
@@ -109,6 +145,12 @@ class Game {
 
   // 设置关卡并开始
   setLevel(levelKey) {
+    // 回合切换生命周期：清空挂起定时器/残留语音，推进回合代际使旧回调失效
+    this._clearTimers();
+    AudioManager.stopSpeech();
+    this.roundId++;
+    this._speaking = false;
+
     this.level = LEVELS[levelKey];
     this.levelKey = levelKey;
     this.levelItems = this.level.items;
@@ -116,7 +158,7 @@ class Game {
     this.streak = 0;
     this.starsToWin = CONFIG.starsToWin;
     this.jarBubbles = [];
-    document.getElementById('score').textContent = '0';
+    UI.setScore(0);
     this.startRound();
   }
 
@@ -139,10 +181,7 @@ class Game {
     this.hintTimer = 0;
     this.hintLevel = 0;
 
-    const hint = document.getElementById('color-hint');
-    hint.textContent = this.targetItem.label;
-    hint.style.color = this.targetItem.color;
-    hint.style.display = 'block';
+    UI.showTarget(this.targetItem);
 
     // 用关卡的 prompt 模板生成语音
     const promptText = this.level.prompt(this.targetItem);
@@ -169,7 +208,10 @@ class Game {
         b.fadeIn = Math.min(1, b.fadeIn + 0.02);
       }
     });
-    this.balloons = this.balloons.filter(b => b.alive);
+    this.balloons = this.balloons.filter(b => {
+      if (!b.alive) { b.dispose(); return false; } // 显式销毁：释放引用
+      return true;
+    });
 
     // 更新撒花
     this.confetti.forEach(c => {
@@ -266,20 +308,19 @@ class Game {
     const slot = balloon.slot;
     balloon.pop();
     this.score++;
-    document.getElementById('score').textContent = this.score;
+    UI.setScore(this.score);
     this.setState(GameState.TRANSITION);
 
     // 更新星星瓶子
     this._addJarBubbles();
 
     AudioManager.playPop();
-    setTimeout(() => AudioManager.playCheer(), 150);
+    this._setTimeout(() => AudioManager.playCheer(), 150);
     this.spawnConfetti(balloon.x, balloon.y);
     this._spawnCelebEmoji(balloon.x, balloon.y);
 
     // 立即清掉旧单词
-    document.getElementById('color-hint').textContent = '⭐';
-    document.getElementById('color-hint').style.color = '#FFD700';
+    UI.showStar();
 
     // 记录学习数据
     SpacedRep.record(this.levelKey, balloon.item.id, true);
@@ -290,8 +331,11 @@ class Game {
     this._triggerStreakEffects(balloon.x, balloon.y);
     this.handCursor.setStreakLevel(this.streak);
     const word = this.level.correctSay(balloon.item);
+    const round = this.roundId; // 回合代际：回调触发时若已切关，整条链作废
     AudioManager.speakColor(word, () => {
+      if (round !== this.roundId) return;
       AudioManager.speakPraise(this.streak, () => {
+        if (round !== this.roundId) return;
         // 通关检查
         if (this.score >= this.starsToWin) {
           this.onLevelComplete();
@@ -307,7 +351,7 @@ class Game {
     this.setState(GameState.COMPLETE);
     // 大撒花
     for (let i = 0; i < 5; i++) {
-      setTimeout(() => {
+      this._setTimeout(() => {
         this.spawnConfetti(
           Math.random() * this.canvas.width,
           Math.random() * this.canvas.height * 0.5
@@ -315,14 +359,13 @@ class Game {
       }, i * 200);
     }
 
-    document.getElementById('color-hint').textContent = '🎉 Great!';
-    document.getElementById('color-hint').style.color = '#FFD700';
+    UI.showComplete();
 
     AudioManager.speakGeneric('You did it! Amazing!');
-    setTimeout(() => AudioManager.playCheer(), 500);
+    this._setTimeout(() => AudioManager.playCheer(), 500);
 
     // 延迟后回首页
-    setTimeout(() => {
+    this._setTimeout(() => {
       startNextLevel();
     }, CONFIG.levelCompleteDelayMs);
   }
@@ -338,8 +381,11 @@ class Game {
     Analytics.track('wrong', { level: this.levelKey, item: balloon.item.id, target: this.targetItem.id });
     AudioManager.playWrong();
     this._speaking = true;
+    const round = this.roundId;
     const wrongText = 'No! ' + this.level.wrongSay(balloon.item, this.targetItem);
-    AudioManager.speakGeneric(wrongText, () => { this._speaking = false; });
+    AudioManager.speakGeneric(wrongText, () => {
+      if (round === this.roundId) this._speaking = false; // 过期回调不动新回合的锁
+    });
   }
 
   spawnConfetti(x, y) {
@@ -358,20 +404,9 @@ class Game {
     }
   }
 
-  _drawCloud(ctx, x, y, size) {
-    ctx.fillStyle = 'rgba(255, 255, 255, 0.8)';
-    ctx.beginPath();
-    ctx.arc(x, y, size * 0.5, 0, Math.PI * 2);
-    ctx.arc(x + size * 0.4, y - size * 0.2, size * 0.4, 0, Math.PI * 2);
-    ctx.arc(x + size * 0.8, y, size * 0.45, 0, Math.PI * 2);
-    ctx.arc(x + size * 0.35, y + size * 0.15, size * 0.35, 0, Math.PI * 2);
-    ctx.fill();
-  }
-
   // === 中文提示 ===
 
   _showChineseHint() {
-    const hint = document.getElementById('color-hint');
     const cnMap = {
       red:'红色', blue:'蓝色', yellow:'黄色', green:'绿色', purple:'紫色',
       orange:'橙色', pink:'粉色', white:'白色', black:'黑色', brown:'棕色',
@@ -405,11 +440,10 @@ class Game {
     };
     const en = this.targetItem.id;
     const cn = cnMap[en];
+    UI.setHintHTML(`${this.targetItem.label}<br><span style="font-size:28px;color:#555">👆 Find the ${en}! 👆</span>`);
     if (cn) {
-      hint.innerHTML = `${this.targetItem.label}<br><span style="font-size:28px;color:#555">👆 Find the ${en}! 👆</span>`;
       AudioManager.speakGeneric(`${en}! It means ${cn}! Find the ${en}!`);
     } else {
-      hint.innerHTML = `${this.targetItem.label}<br><span style="font-size:28px;color:#555">👆 Find the ${en}! 👆</span>`;
       AudioManager.speakGeneric(`Find the ${en}!`);
     }
   }
@@ -433,7 +467,7 @@ class Game {
   // === 连击语音鼓励（延迟说，不打断当前语音） ===
 
   _speakStreakCheer(text) {
-    setTimeout(() => {
+    this._setTimeout(() => {
       AudioManager.speakGeneric(text);
     }, 1500);
   }
@@ -454,118 +488,6 @@ class Game {
     }
   }
 
-  _drawStarJar(ctx) {
-    const total = this.starsToWin;
-    const filled = this.score;
-
-    // 瓶子位置和尺寸（集中在 CONFIG.starJar）
-    const jarX = CONFIG.starJar.x;
-    const jarTopY = CONFIG.starJar.topY;
-    const jarW = CONFIG.starJar.w;
-    const jarH = CONFIG.starJar.h;
-    const jarBottomY = jarTopY + jarH;
-    const cornerR = CONFIG.starJar.cornerR;
-
-    // 瓶口
-    ctx.save();
-    ctx.fillStyle = 'rgba(255,255,255,0.3)';
-    ctx.strokeStyle = 'rgba(255,255,255,0.6)';
-    ctx.lineWidth = 3;
-
-    // 瓶身（圆角矩形）
-    const bx = jarX, by = jarTopY, bw = jarW, bh = jarH;
-    ctx.beginPath();
-    ctx.moveTo(bx + cornerR, by);
-    ctx.lineTo(bx + bw - cornerR, by);
-    ctx.quadraticCurveTo(bx + bw, by, bx + bw, by + cornerR);
-    ctx.lineTo(bx + bw, by + bh - cornerR);
-    ctx.quadraticCurveTo(bx + bw, by + bh, bx + bw - cornerR, by + bh);
-    ctx.lineTo(bx + cornerR, by + bh);
-    ctx.quadraticCurveTo(bx, by + bh, bx, by + bh - cornerR);
-    ctx.lineTo(bx, by + cornerR);
-    ctx.quadraticCurveTo(bx, by, bx + cornerR, by);
-    ctx.closePath();
-    ctx.fill();
-    ctx.stroke();
-
-    // 星星网格：从下往上排列
-    const cols = CONFIG.starJar.cols;
-    const starSize = CONFIG.starJar.starSize;
-    const padX = (jarW - cols * starSize) / (cols + 1);
-    const padY = 4;
-    const rows = Math.ceil(total / cols);
-
-    for (let i = 0; i < total; i++) {
-      const row = Math.floor(i / cols);
-      const col = i % cols;
-      const sx = jarX + padX + col * (starSize + padX) + starSize / 2;
-      // 从底部往上排
-      const sy = jarBottomY - cornerR - padY - (row + 0.5) * (starSize + padY);
-
-      const isLit = i < filled;
-      const wobble = isLit ? Math.sin(this.time * 0.05 + i) * 1.5 : 0;
-
-      ctx.font = `${starSize}px Arial`;
-      ctx.textAlign = 'center';
-      ctx.textBaseline = 'middle';
-
-      if (isLit) {
-        // 金色星星 — 带发光
-        ctx.shadowColor = '#FFD700';
-        ctx.shadowBlur = 8;
-        ctx.fillText('⭐', sx, sy + wobble);
-        ctx.shadowBlur = 0;
-      } else {
-        // 灰色星星
-        ctx.globalAlpha = 0.3;
-        ctx.fillText('⭐', sx, sy);
-        ctx.globalAlpha = 1;
-      }
-    }
-
-    // 瓶中气泡
-    this.jarBubbles.forEach(b => {
-      ctx.globalAlpha = b.life * 0.5;
-      ctx.fillStyle = '#FFD700';
-      ctx.beginPath();
-      ctx.arc(b.x, b.y, b.size, 0, Math.PI * 2);
-      ctx.fill();
-    });
-    ctx.globalAlpha = 1;
-
-    // 进度数字
-    ctx.font = 'bold 18px Arial Rounded MT Bold, Nunito, Arial';
-    ctx.textAlign = 'center';
-    ctx.fillStyle = '#FFD700';
-    ctx.shadowColor = 'rgba(0,0,0,0.5)';
-    ctx.shadowBlur = 4;
-    ctx.fillText(`${filled}/${total}`, jarX + jarW / 2, jarBottomY + 20);
-    ctx.shadowBlur = 0;
-
-    // 满瓶闪光
-    if (filled >= total) {
-      const glow = Math.sin(this.time * 0.1) * 0.2 + 0.3;
-      ctx.globalAlpha = glow;
-      ctx.strokeStyle = '#FFD700';
-      ctx.lineWidth = 4;
-      ctx.beginPath();
-      ctx.moveTo(bx + cornerR, by);
-      ctx.lineTo(bx + bw - cornerR, by);
-      ctx.quadraticCurveTo(bx + bw, by, bx + bw, by + cornerR);
-      ctx.lineTo(bx + bw, by + bh - cornerR);
-      ctx.quadraticCurveTo(bx + bw, by + bh, bx + bw - cornerR, by + bh);
-      ctx.lineTo(bx + cornerR, by + bh);
-      ctx.quadraticCurveTo(bx, by + bh, bx, by + bh - cornerR);
-      ctx.lineTo(bx, by + cornerR);
-      ctx.quadraticCurveTo(bx, by, bx + cornerR, by);
-      ctx.closePath();
-      ctx.stroke();
-      ctx.globalAlpha = 1;
-    }
-
-    ctx.restore();
-  }
-
   // === 正向刺激特效 ===
 
   _triggerStreakEffects(x, y) {
@@ -579,7 +501,7 @@ class Game {
       this.screenFlashColor = '#FFD700';
       AudioManager.playStreakBonus();
       for (let i = 0; i < 3; i++) {
-        setTimeout(() => {
+        this._setTimeout(() => {
           this.spawnConfetti(
             x + (Math.random() - 0.5) * 200,
             y + (Math.random() - 0.5) * 100
@@ -626,7 +548,7 @@ class Game {
   _spawnRipples(x, y) {
     const colors = CONFIG.fx.colors;
     for (let i = 0; i < CONFIG.fx.ripplesPerCombo; i++) {
-      setTimeout(() => {
+      this._setTimeout(() => {
         this.ripples.push({
           x, y,
           radius: 10,
@@ -654,192 +576,4 @@ class Game {
     }
   }
 
-  _drawEffects(ctx) {
-    const w = this.canvas.width;
-    const h = this.canvas.height;
-
-    // 屏幕闪光
-    if (this.screenFlash > 0.01) {
-      ctx.save();
-      ctx.globalAlpha = this.screenFlash;
-      ctx.fillStyle = this.screenFlashColor;
-      ctx.fillRect(0, 0, w, h);
-      ctx.restore();
-    }
-
-    // 彩虹波纹
-    this.ripples.forEach(r => {
-      ctx.save();
-      ctx.globalAlpha = r.life * 0.6;
-      ctx.strokeStyle = r.color;
-      ctx.lineWidth = r.lineWidth * r.life;
-      ctx.beginPath();
-      ctx.arc(r.x, r.y, r.radius, 0, Math.PI * 2);
-      ctx.stroke();
-      ctx.restore();
-    });
-
-    // 飞行星星
-    this.flyingStars.forEach(s => {
-      ctx.save();
-      ctx.globalAlpha = Math.min(1, s.life * 2);
-      ctx.font = `${s.size * s.scale}px Arial`;
-      ctx.textAlign = 'center';
-      ctx.textBaseline = 'middle';
-      ctx.fillText('⭐', s.x, s.y);
-      ctx.restore();
-    });
-
-    // 星星雨
-    this.starRain.forEach(s => {
-      ctx.save();
-      ctx.globalAlpha = s.life;
-      ctx.translate(s.x, s.y);
-      ctx.rotate(s.rotation);
-      ctx.font = `${s.size}px Arial`;
-      ctx.textAlign = 'center';
-      ctx.textBaseline = 'middle';
-      ctx.fillText(s.emoji, 0, 0);
-      ctx.restore();
-    });
-
-    // 连击文字
-    if (this.comboTextTimer > 0) {
-      ctx.save();
-      const alpha = Math.min(1, this.comboTextTimer / 20);
-      const scale = 1 + (1 - alpha) * 0.3;
-      ctx.globalAlpha = alpha;
-      ctx.translate(w / 2, h * 0.25);
-      ctx.scale(scale, scale);
-      ctx.font = 'bold 52px "Arial Rounded MT Bold", Nunito, Arial, sans-serif';
-      ctx.textAlign = 'center';
-      ctx.textBaseline = 'middle';
-      ctx.fillStyle = '#FFD700';
-      ctx.shadowColor = 'rgba(0,0,0,0.3)';
-      ctx.shadowBlur = 8;
-      ctx.fillText(this.comboText, 0, 0);
-      ctx.restore();
-    }
-  }
-
-  draw() {
-    const ctx = this.ctx;
-    const w = this.canvas.width;
-    const h = this.canvas.height;
-    ctx.clearRect(0, 0, w, h);
-
-    // === 背景渲染（根据 CONFIG.backgroundMode） ===
-    const bgMode = CONFIG.backgroundMode;
-    const video = document.getElementById('pose-video');
-
-    if (bgMode === 'none') {
-      // 纯摄像头画面，无背景装饰
-      if (video.readyState >= 2) {
-        ctx.save();
-        ctx.translate(w, 0);
-        ctx.scale(-1, 1);
-        ctx.drawImage(video, 0, 0, w, h);
-        ctx.restore();
-      }
-    } else if (bgMode === 'transparent') {
-      // 先画童趣背景
-      const skyGrad = ctx.createLinearGradient(0, 0, 0, h * 0.75);
-      skyGrad.addColorStop(0, '#87CEEB');
-      skyGrad.addColorStop(1, '#E0F7FF');
-      ctx.fillStyle = skyGrad;
-      ctx.fillRect(0, 0, w, h);
-
-      const grassGrad = ctx.createLinearGradient(0, h * 0.75, 0, h);
-      grassGrad.addColorStop(0, '#90D26D');
-      grassGrad.addColorStop(1, '#6BBF4E');
-      ctx.fillStyle = grassGrad;
-      ctx.beginPath();
-      ctx.moveTo(0, h * 0.78);
-      for (let x = 0; x <= w; x += w / 8) {
-        ctx.quadraticCurveTo(x + w / 16, h * 0.75 + Math.sin(x * 0.005 + this.time * 0.01) * 8, x + w / 8, h * 0.78);
-      }
-      ctx.lineTo(w, h);
-      ctx.lineTo(0, h);
-      ctx.closePath();
-      ctx.fill();
-
-      this._drawCloud(ctx, ((this.time * 0.15) % (w + 200)) - 100, h * 0.12, 60);
-      this._drawCloud(ctx, ((this.time * 0.1 + w * 0.5) % (w + 200)) - 100, h * 0.22, 45);
-      this._drawCloud(ctx, ((this.time * 0.08 + w * 0.25) % (w + 200)) - 100, h * 0.08, 35);
-
-      // 半透明摄像头叠加
-      if (video.readyState >= 2) {
-        ctx.save();
-        ctx.globalAlpha = 0.5;
-        ctx.translate(w, 0);
-        ctx.scale(-1, 1);
-        ctx.drawImage(video, 0, 0, w, h);
-        ctx.restore();
-        ctx.globalAlpha = 1;
-      }
-    }
-
-    // 星星瓶子
-    this._drawStarJar(ctx);
-
-    // 气球（支持淡入 + 提示闪烁）
-    this.balloons.forEach(b => {
-      if (b.fadeIn !== undefined && b.fadeIn < 1 && !b.popping) {
-        ctx.globalAlpha = b.fadeIn;
-      }
-      b.draw(ctx, this.time);
-      ctx.globalAlpha = 1;
-
-      // 提示高亮：正确气球闪烁光圈
-      if (this.hintLevel >= 1 && this.targetItem && b.item.id === this.targetItem.id && !b.popping) {
-        ctx.save();
-        const pulse = Math.sin(this.time * 0.1) * 0.3 + 0.5;
-        ctx.globalAlpha = pulse;
-        ctx.strokeStyle = '#FFD700';
-        ctx.lineWidth = this.hintLevel >= 2 ? 8 : 4;
-        ctx.shadowColor = '#FFD700';
-        ctx.shadowBlur = this.hintLevel >= 2 ? 25 : 12;
-        ctx.beginPath();
-        ctx.arc(b.x, b.y, b.radius * 1.3, 0, Math.PI * 2);
-        ctx.stroke();
-
-        // 强提示：画箭头指向
-        if (this.hintLevel >= 2) {
-          ctx.globalAlpha = pulse;
-          ctx.font = '48px Arial';
-          ctx.textAlign = 'center';
-          ctx.fillText('👇', b.x, b.y - b.radius * 1.5);
-        }
-        ctx.restore();
-      }
-    });
-
-    // 庆祝表情
-    this.celebEmojis.forEach(e => {
-      ctx.save();
-      ctx.globalAlpha = e.life;
-      ctx.font = `${e.size * e.scale}px Arial`;
-      ctx.textAlign = 'center';
-      ctx.textBaseline = 'middle';
-      ctx.fillText(e.emoji, e.x, e.y);
-      ctx.restore();
-    });
-
-    // 撒花
-    this.confetti.forEach(c => {
-      ctx.save();
-      ctx.globalAlpha = c.life;
-      ctx.translate(c.x, c.y);
-      ctx.rotate(c.rotation);
-      ctx.fillStyle = c.color;
-      ctx.fillRect(-c.size / 2, -c.size / 2, c.size, c.size * 0.6);
-      ctx.restore();
-    });
-
-    // 正向刺激特效
-    this._drawEffects(ctx);
-
-    // 手部高亮光标
-    this.handCursor.draw(ctx);
-  }
 }

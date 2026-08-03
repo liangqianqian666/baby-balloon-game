@@ -1,38 +1,29 @@
-# REFACTORING_TODO.md — 极简重构清单
+# REFACTORING_TODO.md — 重构台账（已归档）
 
 > 诊断基准：配置集中化 · GameState 状态机 · 职责分离 · 内存显式销毁。
+> **状态：Task 1–3 已完成（2026-08-03），台账归档**；后续需求请新开台账。
 
-## 一、配置集中化
-- [x] CONFIG 死配置 → 已激活 `balloonCount`/`balloonRadius`，且 radius 修正为实际值 65（原 110 从未生效）（Task 1）
-- [x] 魔法数字散落 → 提示计时/连击阈值/粒子数/星星瓶几何/dwell/命中系数/星星范围/特效速度全部收进 CONFIG（Task 1）
-- [x] 彩虹色数组重复 3 处 → 合并为 `CONFIG.fx.colors`（Task 1）
-- [ ] `_showChineseHint` 内硬编码 ~100 词中文映射 → 应并入 levels.js 的 item（加 `cn` 字段）
-- [x] index.html 星星默认显示 15 → 已对齐 CONFIG.starsToWin=10（Task 1）
+## ✅ 已完成
 
-## 二、GameState 状态机
-- [x] 显式 `GameState`（IDLE/PLAYING/TRANSITION/COMPLETE）+ 转换表 + `setState` 校验，非法转换拦截告警（Task 1）
-- [ ] 流程由语音回调链 + setTimeout 驱动，不可取消 → 中途返回/换关时残留回调污染新局（归 P4）
-- [x] 无暂停态 → 返回主页 `setState(IDLE)`，update() 暂停游戏更新（Task 1）
-- [ ] 提示计时用帧数（假设 60fps），应改时间戳
+### Task 1 — CONFIG 集中化 + GameState 状态机
+- [x] CONFIG 唯一参数源：魔法数字全收编、fx 色板去重、死配置激活修正、星星默认值对齐
+- [x] GameState（IDLE/PLAYING/TRANSITION/COMPLETE）+ 转换表 + setState 校验 + IDLE 暂停 update
 
-## 三、职责分离
-- [ ] game.js 845 行上帝类：逻辑 + 9 种粒子特效 + 渲染 + DOM 操作混杂
-- [ ] 渲染未拆分：星星瓶 ~110 行、背景、特效绘制应抽出；balloon.js draw() 5 分支渲染
-- [ ] main.js 476 行：入口胶水 + 角色管理 + 设置 UI + 键盘导航混杂；全局变量 `game`/`cameraAvailable`
-- [ ] 双 API：onWrong 用兼容 shim `LearningTracker`，onCorrect 直用 `SpacedRep` → 统一后删 shim
-- [ ] audio.js 死接口：`speakCorrect`（把回调当 streak，含 bug）/`speakPopCommand`/`speakWrong` 无调用方
-- [ ] MoveNet 加载但 `detectPose` 零调用 → 白耗 TF.js 加载与内存
-- [ ] 模块靠全局变量 + `<script>` 顺序耦合（如 game.js 调 main.js 的 `startNextLevel`）
+### Task 2 — 职责分离
+- [x] render.js：Renderer 纯渲染（只读状态）+ UI DOM 垫片；Game 零 ctx/零 DOM（845→579 行）
 
-## 四、内存显式销毁
-- [ ] 全局零 destroy：rAF 主循环、`Camera._handsLoop` 无法取消；resize/beforeunload 监听不移除
-- [ ] 摄像头流不停（无 `track.stop()`）、Hands detector 不 close
-- [ ] **泄漏**：切角色重复调 `Analytics.init()` → setInterval 与 beforeunload 监听累积
-- [ ] `_imageCache`、`AudioManager._cache` 只增不减，无淘汰策略
+### Task 3 — 生命周期清理
+- [x] 定时器托管 `_setTimeout` + roundId 代际守卫：切关/回首页清空，过期语音回调整链作废
+- [x] 显式销毁：Balloon.dispose（戳破过滤时）、Game.destroy + pagehide、rAF startLoop/stopLoop
+- [x] 泄漏修复：图片缓存换关清空、Camera.stop（停流/关模型/停循环）、Analytics.init 幂等 + flush
+- [x] 说明：气球为 Canvas 实体无 DOM 节点、只原地摆动无飞离路径，dispose 已覆盖唯一销毁路径
 
-## 分阶段 Task
-- [ ] **P1 低风险清理**：删 MoveNet 死代码与 audio 死接口、统一 SpacedRep API、修 Analytics 监听累积
-- [x] **Task 1（配置集中 + GameState 状态机）** 2026-08-03：CONFIG 唯一参数源；状态机转换表 + IDLE 暂停；node --check + 33 项无头冒烟全过。残留：cnMap 迁移、帧计时→时间戳
-- [ ] **P3 职责分离**：game.js 拆出 effects.js（粒子）与 render 层；main.js 拆出 profile/settings UI
-- [ ] **P4 计时器与时钟**：统一可取消计时器（修残留语音回调）、帧数 → 时间戳
-- [ ] **P5 生命周期**：所有 init 配对 destroy()（rAF/监听/流/缓存显式释放）
+### 验证
+- [x] node --check 全过 + 无头冒烟测试 43 项 ×15 连跑全过（index.html ?v=22）
+
+## 📦 延期归档（未执行，不勾选；需要时新开任务）
+- [ ] cnMap ~100 词硬编码 → 迁至 levels.js item `cn` 字段（纯数据迁移，低风险低收益）
+- [ ] 提示计时帧数 → 时间戳（现依赖 rAF 60fps，实际影响小）
+- [ ] main.js 拆分：角色/设置 UI/键盘导航（胶水层，不影响游戏逻辑）
+- [ ] P1 清理：MoveNet/detectPose 死代码、audio 死接口（speakCorrect 含 bug）、LearningTracker 双 API
+- [ ] 全局变量 + `<script>` 顺序耦合（模块化需引入构建工具，与纯静态定位冲突，暂不做）

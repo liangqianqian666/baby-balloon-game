@@ -21,11 +21,13 @@ const Analytics = {
     }
     this._userId = userId;
 
-    // 页面关闭时保存
-    window.addEventListener('beforeunload', () => this._saveSession());
-
-    // 每30秒自动保存
-    setInterval(() => this._saveSession(), 30000);
+    // 监听/定时器幂等注册：切角色会重复调 init()，此前会累积监听与定时器（泄漏）
+    if (!this._unloadBound) {
+      window.addEventListener('beforeunload', () => this._saveSession());
+      this._unloadBound = true;
+    }
+    if (this._saveTimer) clearInterval(this._saveTimer);
+    this._saveTimer = setInterval(() => this._saveSession(), 30000);
 
     this.track('session_start', { userAgent: navigator.userAgent });
   },
@@ -37,6 +39,11 @@ const Analytics = {
       time: Date.now(),
       ...data,
     });
+  },
+
+  // 显式落盘入口（pagehide 拆除流程调用）
+  flush() {
+    this._saveSession();
   },
 
   // 保存会话数据到 localStorage

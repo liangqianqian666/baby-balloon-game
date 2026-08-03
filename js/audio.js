@@ -59,6 +59,11 @@ const AudioManager = {
     speechSynthesis.speak(u);
   },
 
+  // 打断当前 TTS（切关/回首页/销毁）；配合 roundId 守卫防止过期回调
+  stopSpeech() {
+    try { speechSynthesis.cancel(); } catch (e) {}
+  },
+
   // --- 游戏语音接口 ---
 
   // 通用语音朗读（用于关卡指令和错误提示）
