@@ -34,7 +34,7 @@ class Balloon {
     this.y = y;
     this.item = item; // { id, label, color, lightColor, display }
     this.color = item.id; // 兼容旧逻辑
-    this.radius = radius || 65;
+    this.radius = radius || CONFIG.balloonRadius;
     this.wobbleOffset = Math.random() * Math.PI * 2;
     this.wobbleSpeedX = 0.015 + Math.random() * 0.01;
     this.wobbleSpeedY = 0.02 + Math.random() * 0.015;
@@ -50,9 +50,9 @@ class Balloon {
     this.breathSpeed = 0.03 + Math.random() * 0.01;
     this.slot = 0;
     this.fadeIn = 0;
-    this.immunity = 60;       // 新气球保护期：~1秒内不可被触碰
+    this.immunity = CONFIG.balloonImmunityFrames; // 新气球保护期（~1秒内不可被触碰）
     this.dwellTime = 0;      // 手停留在气球上的帧数
-    this.dwellThreshold = 12; // 需要停留约 200ms（~12帧@60fps）才算触碰
+    this.dwellThreshold = CONFIG.dwellThresholdFrames; // 停留多少帧才算触碰（~200ms@60fps）
 
     // 预加载图片（根据图片风格选择）
     this._resolveDisplay();
@@ -116,8 +116,9 @@ class Balloon {
     this.popping = true;
     this.popProgress = 0;
     const fillColor = this.item.color;
-    for (let i = 0; i < 12; i++) {
-      const angle = (Math.PI * 2 / 12) * i;
+    const n = CONFIG.fx.balloonParticles;
+    for (let i = 0; i < n; i++) {
+      const angle = (Math.PI * 2 / n) * i;
       this.particles.push({
         x: this.x, y: this.y,
         vx: Math.cos(angle) * (3 + Math.random() * 4),
@@ -278,6 +279,6 @@ class Balloon {
     if (this.popping) return false;
     const dx = px - this.x;
     const dy = py - this.y;
-    return (dx * dx + dy * dy) < (this.radius * this.radius * 2.5);
+    return (dx * dx + dy * dy) < (this.radius * this.radius * CONFIG.hitRadiusFactor);
   }
 }

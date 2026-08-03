@@ -1,5 +1,19 @@
 // game.js — 游戏主逻辑
 
+// 显式游戏状态机：所有状态变更必须走 Game.setState（按转换表校验，非法转换拦截并告警）
+const GameState = {
+  IDLE: 'idle',             // 未开局 / 已回首页（update 暂停游戏逻辑）
+  PLAYING: 'playing',       // 等待戳中目标
+  TRANSITION: 'transition', // 答对反馈中（等语音回调链结束）
+  COMPLETE: 'complete',     // 关卡通关
+  TRANSITIONS: {
+    idle: ['playing'],
+    playing: ['transition', 'idle', 'playing'], // playing→playing: 中途换关/重开
+    transition: ['playing', 'complete', 'idle'],
+    complete: ['playing', 'idle'],
+  },
+};
+
 class Game {
   constructor(canvas) {
     this.canvas = canvas;
@@ -8,10 +22,10 @@ class Game {
     this.balloons = [];
     this.score = 0;
     this.targetItem = null; // 当前目标 item
-    this.state = 'waiting'; // waiting | playing | transition
+    this.state = GameState.IDLE; // 状态枚举见 GameState
     this.time = 0;
     this.confetti = [];
-    this.balloonCount = 4;
+    this.balloonCount = CONFIG.balloonCount;
     this.streak = 0;
 
     // 正向刺激特效
@@ -42,6 +56,16 @@ class Game {
   resize() {
     this.canvas.width = window.innerWidth;
     this.canvas.height = window.innerHeight;
+  }
+
+  // 状态机唯一入口：非法转换拦截并告警，不改变状态
+  setState(next) {
+    const allowed = GameState.TRANSITIONS[this.state] || [];
+    if (!allowed.includes(next)) {
+      console.warn(`[GameState] 非法转换已拦截: ${this.state} → ${next}`);
+      return;
+    }
+    this.state = next;
   }
 
   // 固定四个位置：左、左上、右上、右
@@ -76,7 +100,7 @@ class Game {
   _addBalloon(slot) {
     const pos = this._getCirclePosition(slot, this.balloonCount);
     const item = this._pickNewItem();
-    const b = new Balloon(pos.x, pos.y, item, 65);
+    const b = new Balloon(pos.x, pos.y, item, CONFIG.balloonRadius);
     b.slot = slot;
     b.fadeIn = 0;
     this.balloons.push(b);
@@ -111,7 +135,7 @@ class Game {
     if (aliveItems.length === 0) return;
 
     this.targetItem = SpacedRep.pickTarget(this.levelKey, aliveItems);
-    this.state = 'playing';
+    this.setState(GameState.PLAYING);
     this.hintTimer = 0;
     this.hintLevel = 0;
 
@@ -126,6 +150,9 @@ class Game {
   }
 
   async update() {
+    // 首页/未开局：暂停全部游戏更新（画布隐藏时无意义消耗）
+    if (this.state === GameState.IDLE) return;
+
     this.time++;
 
     // MediaPipe Hands → 手部光标
@@ -148,7 +175,7 @@ class Game {
     this.confetti.forEach(c => {
       c.x += c.vx;
       c.y += c.vy;
-      c.vy += 0.15;
+      c.vy += CONFIG.fx.confettiGravity;
       c.rotation += c.rotSpeed;
       c.life -= 0.01;
     });
@@ -170,11 +197,11 @@ class Game {
     if (this.comboTextTimer > 0) this.comboTextTimer--;
 
     // 更新彩虹波纹
-    this.ripples.forEach(r => { r.radius += 6; r.life -= 0.02; });
+    this.ripples.forEach(r => { r.radius += CONFIG.fx.rippleSpeed; r.life -= 0.02; });
     this.ripples = this.ripples.filter(r => r.life > 0);
 
     // 更新星星雨
-    this.starRain.forEach(s => { s.y += s.vy; s.x += s.vx; s.vy += 0.08; s.rotation += 0.05; s.life -= 0.008; });
+    this.starRain.forEach(s => { s.y += s.vy; s.x += s.vx; s.vy += CONFIG.fx.starRainGravity; s.rotation += 0.05; s.life -= 0.008; });
     this.starRain = this.starRain.filter(s => s.life > 0);
 
     // 更新庆祝表情
@@ -187,22 +214,22 @@ class Game {
     this.jarBubbles = this.jarBubbles.filter(b => b.life > 0);
 
     // 找不到提示计时
-    if (this.state === 'playing') {
+    if (this.state === GameState.PLAYING) {
       this.hintTimer++;
-      // 4秒（~240帧）→ 轻提示：正确气球开始闪烁 + 中文提示
-      if (this.hintTimer === 240 && this.hintLevel < 1) {
+      // ~4s → 轻提示：正确气球开始闪烁 + 中文提示
+      if (this.hintTimer === CONFIG.hint.lightFrames && this.hintLevel < 1) {
         this.hintLevel = 1;
         this._showChineseHint();
       }
-      // 8秒（~480帧）→ 强提示：正确气球高亮箭头指向
-      if (this.hintTimer === 480 && this.hintLevel < 2) {
+      // ~8s → 强提示：正确气球高亮箭头指向
+      if (this.hintTimer === CONFIG.hint.strongFrames && this.hintLevel < 2) {
         this.hintLevel = 2;
         AudioManager.speakGeneric('Here!');
       }
     }
 
     // 碰撞检测（需要停留才触发）
-    if (this.state === 'playing') {
+    if (this.state === GameState.PLAYING) {
       const hands = this.handCursor.getActivePositions();
       for (const balloon of this.balloons) {
         if (balloon.popping) continue;
@@ -240,7 +267,7 @@ class Game {
     balloon.pop();
     this.score++;
     document.getElementById('score').textContent = this.score;
-    this.state = 'transition';
+    this.setState(GameState.TRANSITION);
 
     // 更新星星瓶子
     this._addJarBubbles();
@@ -277,7 +304,7 @@ class Game {
   }
 
   onLevelComplete() {
-    this.state = 'complete';
+    this.setState(GameState.COMPLETE);
     // 大撒花
     for (let i = 0; i < 5; i++) {
       setTimeout(() => {
@@ -294,10 +321,10 @@ class Game {
     AudioManager.speakGeneric('You did it! Amazing!');
     setTimeout(() => AudioManager.playCheer(), 500);
 
-    // 3秒后自动进入下一关
+    // 延迟后回首页
     setTimeout(() => {
       startNextLevel();
-    }, 3500);
+    }, CONFIG.levelCompleteDelayMs);
   }
 
   onWrong(balloon) {
@@ -316,8 +343,8 @@ class Game {
   }
 
   spawnConfetti(x, y) {
-    const colors = ['#FF6B6B', '#FFD93D', '#6BCB77', '#4D96FF', '#FF6BB5', '#C9B1FF'];
-    for (let i = 0; i < 30; i++) {
+    const colors = CONFIG.fx.colors;
+    for (let i = 0; i < CONFIG.fx.confettiPerPop; i++) {
       this.confetti.push({
         x, y,
         vx: (Math.random() - 0.5) * 12,
@@ -391,7 +418,7 @@ class Game {
 
   _spawnCelebEmoji(x, y) {
     const emojis = ['🎉', '👏', '🥳', '💪', '🤩', '😍', '🙌', '💖', '🎊', '👍'];
-    for (let i = 0; i < 3; i++) {
+    for (let i = 0; i < CONFIG.fx.celebPerPop; i++) {
       this.celebEmojis.push({
         x: x + (Math.random() - 0.5) * 120,
         y: y + (Math.random() - 0.5) * 60,
@@ -415,10 +442,11 @@ class Game {
 
   _addJarBubbles() {
     // 答对时在瓶中冒几个气泡
+    const jar = CONFIG.starJar;
     for (let i = 0; i < 3; i++) {
       this.jarBubbles.push({
-        x: 40 + Math.random() * 30,
-        y: 260 - Math.random() * 30,
+        x: jar.x + 20 + Math.random() * 30,
+        y: jar.topY + jar.h - 30 - Math.random() * 30,
         size: 2 + Math.random() * 4,
         life: 1,
         offset: Math.random() * Math.PI * 2,
@@ -430,13 +458,13 @@ class Game {
     const total = this.starsToWin;
     const filled = this.score;
 
-    // 瓶子位置和尺寸
-    const jarX = 20;       // 左边距
-    const jarTopY = 70;    // 瓶口
-    const jarW = 60;       // 宽度
-    const jarH = 220;      // 高度
+    // 瓶子位置和尺寸（集中在 CONFIG.starJar）
+    const jarX = CONFIG.starJar.x;
+    const jarTopY = CONFIG.starJar.topY;
+    const jarW = CONFIG.starJar.w;
+    const jarH = CONFIG.starJar.h;
     const jarBottomY = jarTopY + jarH;
-    const cornerR = 12;
+    const cornerR = CONFIG.starJar.cornerR;
 
     // 瓶口
     ctx.save();
@@ -461,8 +489,8 @@ class Game {
     ctx.stroke();
 
     // 星星网格：从下往上排列
-    const cols = 3;
-    const starSize = 16;
+    const cols = CONFIG.starJar.cols;
+    const starSize = CONFIG.starJar.starSize;
     const padX = (jarW - cols * starSize) / (cols + 1);
     const padY = 4;
     const rows = Math.ceil(total / cols);
@@ -541,11 +569,12 @@ class Game {
   // === 正向刺激特效 ===
 
   _triggerStreakEffects(x, y) {
+    const combo = CONFIG.combo;
     // 每次答对：飞星到计分板
     this._spawnFlyingStar(x, y);
 
-    // 连对3个：大撒花 + 金色闪光 + combo文字
-    if (this.streak >= 3 && this.streak % 3 === 0) {
+    // 每连对 bigFxEvery 个：大撒花 + 金色闪光 + 特效音
+    if (this.streak >= combo.bigFxEvery && this.streak % combo.bigFxEvery === 0) {
       this.screenFlash = 0.4;
       this.screenFlashColor = '#FFD700';
       AudioManager.playStreakBonus();
@@ -559,8 +588,8 @@ class Game {
       }
     }
 
-    // 连对5个：彩虹波纹 + 星星雨
-    if (this.streak >= 5 && this.streak % 5 === 0) {
+    // 每连对 rainbowEvery 个：彩虹波纹 + 星星雨
+    if (this.streak >= combo.rainbowEvery && this.streak % combo.rainbowEvery === 0) {
       this._spawnRipples(x, y);
       this._spawnStarRain();
       this.screenFlash = 0.6;
@@ -568,32 +597,25 @@ class Game {
     }
 
     // 连击提示：纯语音+emoji，不显示中文文字
-    if (this.streak >= 2) {
+    if (this.streak >= combo.textStart) {
       const emojis = ['⭐', '🌟', '💫', '🔥', '🚀', '🏆'];
-      const emojiIdx = Math.min(this.streak - 2, emojis.length - 1);
+      const emojiIdx = Math.min(this.streak - combo.textStart, emojis.length - 1);
       this.comboText = `${emojis[emojiIdx]} ${this.streak}x ${emojis[emojiIdx]}`;
       this.comboTextTimer = 80;
 
-      // 语音鼓励（中文语音，孩子听得懂）
-      if (this.streak === 3) {
-        this._speakStreakCheer('You did it! Three in a row!');
-      } else if (this.streak === 5) {
-        this._speakStreakCheer('Five in a row! Can you keep going?');
-      } else if (this.streak === 7) {
-        this._speakStreakCheer('Seven in a row! Wow!');
-      } else if (this.streak === 10) {
-        this._speakStreakCheer('Ten in a row! That is a lot!');
-      }
+      // 语音鼓励里程碑（集中在 CONFIG.combo.cheerAt）
+      const cheer = combo.cheerAt[this.streak];
+      if (cheer) this._speakStreakCheer(cheer);
     }
   }
 
   _spawnFlyingStar(x, y) {
     // 飞向左上角星星瓶子开口
-    for (let i = 0; i < 3; i++) {
+    for (let i = 0; i < CONFIG.fx.flyingStarsPerPop; i++) {
       this.flyingStars.push({
         x: x + (Math.random() - 0.5) * 40,
         y: y + (Math.random() - 0.5) * 40,
-        tx: 55, ty: 80, // 瓶口位置
+        tx: CONFIG.starJar.mouthX, ty: CONFIG.starJar.mouthY, // 瓶口位置
         life: 1,
         scale: 1,
         size: 16 + Math.random() * 10,
@@ -602,8 +624,8 @@ class Game {
   }
 
   _spawnRipples(x, y) {
-    const colors = ['#FF6B6B', '#FFD93D', '#6BCB77', '#4D96FF', '#FF6BB5', '#C9B1FF'];
-    for (let i = 0; i < 4; i++) {
+    const colors = CONFIG.fx.colors;
+    for (let i = 0; i < CONFIG.fx.ripplesPerCombo; i++) {
       setTimeout(() => {
         this.ripples.push({
           x, y,
@@ -618,7 +640,7 @@ class Game {
 
   _spawnStarRain() {
     const w = this.canvas.width;
-    for (let i = 0; i < 20; i++) {
+    for (let i = 0; i < CONFIG.fx.starRainCount; i++) {
       this.starRain.push({
         x: Math.random() * w,
         y: -20 - Math.random() * 100,

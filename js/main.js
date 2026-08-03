@@ -58,7 +58,11 @@ window.addEventListener('DOMContentLoaded', () => {
   showLevelSelect();
 
   // 游戏中按钮
-  document.getElementById('btn-back').addEventListener('click', () => showLevelSelect());
+  document.getElementById('btn-back').addEventListener('click', () => {
+    // 回首页先进 IDLE：暂停游戏更新，避免画布隐藏后仍持续消耗
+    if (game) game.setState(GameState.IDLE);
+    showLevelSelect();
+  });
   document.getElementById('btn-skip').addEventListener('click', () => {
     // 随机选一个不同的关卡
     const keys = Object.keys(LEVELS);
@@ -315,7 +319,7 @@ function initStyleToggle() {
 // 通关星星数调整（+/- 按钮 + 滚轮）
 function initStarsToggle() {
   const display = document.getElementById('stars-value');
-  const minStars = 1, maxStars = 50, step = 1;
+  const minStars = CONFIG.starsRange.min, maxStars = CONFIG.starsRange.max, step = 1;
 
   function updateDisplay() {
     display.textContent = CONFIG.starsToWin;
