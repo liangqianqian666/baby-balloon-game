@@ -10,7 +10,7 @@ const CONFIG = {
   dwellThresholdFrames: 12,          // 停留多少帧算一次命中（~200ms @60fps）
   hitRadiusFactor: 2.5,              // 命中判定面积 = 半径² × 系数
   levelCompleteDelayMs: 3500,        // 通关后回首页延迟
-  transitionWatchdogMs: 5000,        // 答对语音链兜底：TTS 回调丢失时自动推进（Chrome TTS 不稳定）
+  correctProgressDelayMs: 1800,      // 答对后推进延迟：游戏进度由自有定时器驱动，与 TTS 回调完全解耦
   wrongSpeechTimeoutMs: 3000,        // 答错语音锁兜底：回调丢失时自动解锁
 
   // === 生词/熟词配比 ===

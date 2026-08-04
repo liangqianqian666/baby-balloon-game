@@ -117,7 +117,7 @@ class Game {
     return positions[index % positions.length];
   }
 
-  // 找一个空的位置 slot
+  // 找一个空的位置 slot（只统计存活气球，爆裂中的不算占用）
   _findEmptySlot() {
     const usedSlots = this.balloons.filter(b => !b.popping).map(b => b.slot);
     for (let i = 0; i < this.balloonCount; i++) {
@@ -134,6 +134,13 @@ class Game {
 
   // 添加一个新气球
   _addBalloon(slot) {
+    // 槽位防撞：目标槽被存活气球占用时改用空槽 —— 结构上杜绝双球同位重叠
+    if (this.balloons.some(b => !b.popping && b.slot === slot)) {
+      const free = this._findEmptySlot();
+      console.warn(`[Game] 槽位防撞: slot=${slot} 被占用，改用 ${free}`);
+      slot = free;
+      if (slot === -1) return null; // 四槽全满不应发生，保底不叠加
+    }
     const pos = this._getCirclePosition(slot, this.balloonCount);
     const item = this._pickNewItem();
     const b = new Balloon(pos.x, pos.y, item, CONFIG.balloonRadius);
@@ -328,25 +335,19 @@ class Game {
     const word = this.level.correctSay(balloon.item);
     const round = this.roundId; // 回合代际：回调触发时若已切关，整条链作废
     console.log(`[Game] 答对: ${balloon.item.id} round=${round} streak=${this.streak}`);
-    // 兜底看门狗：Chrome TTS 的 onend 偶发丢失（被 cancel 打断/切后台等），
-    // 链条断裂会卡死 TRANSITION（不补气球、无法再戳），超时自动推进
-    this._setTimeout(() => {
-      if (this.state === GameState.TRANSITION && round === this.roundId) {
-        console.warn(`[Game] 看门狗: 答对语音回调超时，自动推进 (round=${round})`);
-        this._progressAfterCorrect(slot, round);
-      }
-    }, CONFIG.transitionWatchdogMs);
+    // 语音纯装饰：表扬跟在单词后播放，死了也不影响游戏
     AudioManager.speakColor(word, () => {
-      if (round !== this.roundId) return;
-      AudioManager.speakPraise(this.streak, () => {
-        if (round !== this.roundId) return;
-        this._progressAfterCorrect(slot, round);
-      });
+      if (round === this.roundId) AudioManager.speakPraise(this.streak);
     });
+    // 游戏进度由自有托管定时器驱动，与 TTS 回调完全解耦 ——
+    // Chrome TTS onend 偶发丢失不再是 bug 源：进度永远按时推进
+    this._setTimeout(() => {
+      this._progressAfterCorrect(slot, round);
+    }, CONFIG.correctProgressDelayMs);
   }
 
   // 答对后推进：通关检查 → 补气球 → 出新目标
-  // （对本回合幂等：正常回调与看门狗谁先到谁生效，另一方被状态守卫挡掉）
+  // （托管定时器在切关/回首页时统一清空，天然防残留；状态+回合双重守卫防重复）
   _progressAfterCorrect(slot, round) {
     if (this.state !== GameState.TRANSITION || round !== this.roundId) return;
     if (this.score >= this.starsToWin) {
