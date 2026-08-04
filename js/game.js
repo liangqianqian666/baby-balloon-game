@@ -68,6 +68,7 @@ class Game {
       console.warn(`[GameState] 非法转换已拦截: ${this.state} → ${next}`);
       return;
     }
+    console.log(`[Game] 状态: ${this.state} → ${next}`); // 诊断日志，定位 TTS 卡死问题后可移除
     this.state = next;
     // 回首页：清空全部挂起定时器与语音，避免污染下一局
     if (next === GameState.IDLE) {
@@ -326,19 +327,34 @@ class Game {
     this.handCursor.setStreakLevel(this.streak);
     const word = this.level.correctSay(balloon.item);
     const round = this.roundId; // 回合代际：回调触发时若已切关，整条链作废
+    console.log(`[Game] 答对: ${balloon.item.id} round=${round} streak=${this.streak}`);
+    // 兜底看门狗：Chrome TTS 的 onend 偶发丢失（被 cancel 打断/切后台等），
+    // 链条断裂会卡死 TRANSITION（不补气球、无法再戳），超时自动推进
+    this._setTimeout(() => {
+      if (this.state === GameState.TRANSITION && round === this.roundId) {
+        console.warn(`[Game] 看门狗: 答对语音回调超时，自动推进 (round=${round})`);
+        this._progressAfterCorrect(slot, round);
+      }
+    }, CONFIG.transitionWatchdogMs);
     AudioManager.speakColor(word, () => {
       if (round !== this.roundId) return;
       AudioManager.speakPraise(this.streak, () => {
         if (round !== this.roundId) return;
-        // 通关检查
-        if (this.score >= this.starsToWin) {
-          this.onLevelComplete();
-          return;
-        }
-        this._addBalloon(slot);
-        this.pickTarget();
+        this._progressAfterCorrect(slot, round);
       });
     });
+  }
+
+  // 答对后推进：通关检查 → 补气球 → 出新目标
+  // （对本回合幂等：正常回调与看门狗谁先到谁生效，另一方被状态守卫挡掉）
+  _progressAfterCorrect(slot, round) {
+    if (this.state !== GameState.TRANSITION || round !== this.roundId) return;
+    if (this.score >= this.starsToWin) {
+      this.onLevelComplete();
+      return;
+    }
+    this._addBalloon(slot);
+    this.pickTarget();
   }
 
   onLevelComplete() {
@@ -377,9 +393,14 @@ class Game {
     this._speaking = true;
     const round = this.roundId;
     const wrongText = 'No! ' + this.level.wrongSay(balloon.item, this.targetItem);
+    console.log(`[Game] 答错: ${balloon.item.id} (目标=${this.targetItem.id}) round=${round}`);
     AudioManager.speakGeneric(wrongText, () => {
       if (round === this.roundId) this._speaking = false; // 过期回调不动新回合的锁
     });
+    // 兜底：TTS 回调丢失时自动解锁，避免答错反馈被永久禁用（同类 bug）
+    this._setTimeout(() => {
+      if (round === this.roundId) this._speaking = false;
+    }, CONFIG.wrongSpeechTimeoutMs);
   }
 
   spawnConfetti(x, y) {
