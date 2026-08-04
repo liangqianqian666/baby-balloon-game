@@ -10,6 +10,8 @@ const CONFIG = {
   dwellThresholdFrames: 12,          // 停留多少帧算一次命中（~200ms @60fps）
   hitRadiusFactor: 2.5,              // 命中判定面积 = 半径² × 系数
   levelCompleteDelayMs: 3500,        // 通关后回首页延迟
+  transitionWatchdogMs: 5000,        // 答对语音链兜底：TTS 回调丢失时自动推进（Chrome TTS 不稳定）
+  wrongSpeechTimeoutMs: 3000,        // 答错语音锁兜底：回调丢失时自动解锁
 
   // === 生词/熟词配比 ===
   newItemRatio: 0.4,       // 40% 概率选全新词
