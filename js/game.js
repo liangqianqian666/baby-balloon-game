@@ -68,7 +68,6 @@ class Game {
       console.warn(`[GameState] 非法转换已拦截: ${this.state} → ${next}`);
       return;
     }
-    console.log(`[Game] 状态: ${this.state} → ${next}`); // 诊断日志，定位 TTS 卡死问题后可移除
     this.state = next;
     // 回首页：清空全部挂起定时器与语音，避免污染下一局
     if (next === GameState.IDLE) {
@@ -334,7 +333,6 @@ class Game {
     this.handCursor.setStreakLevel(this.streak);
     const word = this.level.correctSay(balloon.item);
     const round = this.roundId; // 回合代际：回调触发时若已切关，整条链作废
-    console.log(`[Game] 答对: ${balloon.item.id} round=${round} streak=${this.streak}`);
     // 语音纯装饰：表扬跟在单词后播放，死了也不影响游戏
     AudioManager.speakColor(word, () => {
       if (round === this.roundId) AudioManager.speakPraise(this.streak);
@@ -394,7 +392,6 @@ class Game {
     this._speaking = true;
     const round = this.roundId;
     const wrongText = 'No! ' + this.level.wrongSay(balloon.item, this.targetItem);
-    console.log(`[Game] 答错: ${balloon.item.id} (目标=${this.targetItem.id}) round=${round}`);
     AudioManager.speakGeneric(wrongText, () => {
       if (round === this.roundId) this._speaking = false; // 过期回调不动新回合的锁
     });
