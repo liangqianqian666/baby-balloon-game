@@ -9,6 +9,14 @@
 - **部署方式**: GitHub Pages（仓库为 public）
 - **自动部署**: push 到 main 分支后自动通过 `.github/workflows/pages.yml` 部署
 
+## 分支与发布流程
+- **main** = 线上，永远可玩；只接受 dev 合入，禁止直推
+- **dev** = 日常累积，允许随时坏；本地自测 `python3 -m http.server`（localhost 可用摄像头）
+- **feat/xxx** = 单功能/修复，自测通过后合入 dev
+- 发布：main 上 `git merge --no-ff dev` → `git tag vX.Y.Z` → `git push && git push --tags`
+- 发布前冒烟：鼠标进一关 → 答对/答错 → 通关 → 摄像头模式 → 刷新后学习数据仍在
+- 回滚：Actions 找到上个 tag 的 deploy run → Re-run，或 revert 合入提交
+
 ## 技术栈
 - 纯静态 HTML/JS/Canvas，无构建工具
 - TensorFlow.js MoveNet — 手势追踪
@@ -47,3 +55,7 @@ assets/images/      — SVG 图片资源（按专题分文件夹）
 ## 开发规范
 - **分次提交**：每个 commit 只包含一个功能，不混合多个功能
 - **版本缓存**：每次改动 JS 文件后，index.html 的 `?v=N` 版本号 +1
+
+## TODO（手动）
+- [ ] GitHub 给 main 设 Ruleset 禁止直推（Settings → Rules → Rulesets）
+- [ ] 建 staging 仓库 `baby-balloon-game-dev`（Pages Source: GitHub Actions）+ `git remote add staging`；真机测试 `git push staging dev:main`
