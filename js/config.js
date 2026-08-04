@@ -56,7 +56,6 @@ const CONFIG = {
   fx: {
     confettiPerPop: 30,    // 撒花粒子数/次
     balloonParticles: 12,  // 气球爆裂粒子数
-    celebPerPop: 3,        // 答对庆祝表情数
     flyingStarsPerPop: 3,  // 答对飞星数
     ripplesPerCombo: 4,    // 大连击彩虹波纹数
     starRainCount: 20,     // 星星雨粒子数

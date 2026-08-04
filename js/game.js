@@ -41,7 +41,6 @@ class Game {
     this.starRain = [];       // 星星雨
     this.hintTimer = 0;       // 找不到计时器
     this.hintLevel = 0;       // 提示等级 0=无 1=轻提示 2=强提示
-    this.celebEmojis = [];    // 答对后飘出的大表情
 
     // 星星瓶子（进度可视化）
     this.jarBubbles = [];     // 瓶中气泡
@@ -246,10 +245,6 @@ class Game {
     this.starRain.forEach(s => { s.y += s.vy; s.x += s.vx; s.vy += CONFIG.fx.starRainGravity; s.rotation += 0.05; s.life -= 0.008; });
     this.starRain = this.starRain.filter(s => s.life > 0);
 
-    // 更新庆祝表情
-    this.celebEmojis.forEach(e => { e.y -= 1.5; e.life -= 0.015; e.scale += 0.005; });
-    this.celebEmojis = this.celebEmojis.filter(e => e.life > 0);
-
     // 更新星星瓶子
     // 瓶中气泡
     this.jarBubbles.forEach(b => { b.y -= 0.3; b.life -= 0.01; b.x += Math.sin(this.time * 0.05 + b.offset) * 0.3; });
@@ -317,7 +312,6 @@ class Game {
     AudioManager.playPop();
     this._setTimeout(() => AudioManager.playCheer(), 150);
     this.spawnConfetti(balloon.x, balloon.y);
-    this._spawnCelebEmoji(balloon.x, balloon.y);
 
     // 立即清掉旧单词
     UI.showStar();
@@ -445,22 +439,6 @@ class Game {
       AudioManager.speakGeneric(`${en}! It means ${cn}! Find the ${en}!`);
     } else {
       AudioManager.speakGeneric(`Find the ${en}!`);
-    }
-  }
-
-  // === 庆祝表情 ===
-
-  _spawnCelebEmoji(x, y) {
-    const emojis = ['🎉', '👏', '🥳', '💪', '🤩', '😍', '🙌', '💖', '🎊', '👍'];
-    for (let i = 0; i < CONFIG.fx.celebPerPop; i++) {
-      this.celebEmojis.push({
-        x: x + (Math.random() - 0.5) * 120,
-        y: y + (Math.random() - 0.5) * 60,
-        emoji: emojis[Math.floor(Math.random() * emojis.length)],
-        life: 1,
-        scale: 1 + Math.random() * 0.5,
-        size: 36 + Math.random() * 24,
-      });
     }
   }
 

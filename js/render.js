@@ -84,17 +84,6 @@ class Renderer {
       }
     });
 
-    // 庆祝表情
-    g.celebEmojis.forEach(e => {
-      ctx.save();
-      ctx.globalAlpha = e.life;
-      ctx.font = `${e.size * e.scale}px Arial`;
-      ctx.textAlign = 'center';
-      ctx.textBaseline = 'middle';
-      ctx.fillText(e.emoji, e.x, e.y);
-      ctx.restore();
-    });
-
     // 撒花
     g.confetti.forEach(c => {
       ctx.save();
