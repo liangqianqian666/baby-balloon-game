@@ -25,11 +25,11 @@ baby-balloon-game/
 ## 文件职责表
 | 文件 | 行数 | 职责 | 全局导出 |
 |---|---|---|---|
-| config.js | 78 | 全部可调参数（玩法/提示/连击/特效/星星瓶） | `CONFIG` |
+| config.js | 77 | 全部可调参数（玩法/提示/连击/特效/星星瓶） | `CONFIG` |
 | levels.js | 439 | 14 专题词汇 + prompt/correctSay/wrongSay 模板 | `LEVELS` `LEVEL_CATEGORIES` |
 | spaced-rep.js | 234 | 记录/掌握度/遗忘权重选题 | `SpacedRep` |
-| game.js | 579 | 状态机校验、碰撞、计分、特效状态更新、托管定时器 | `GameState` `Game` |
-| render.js | 366 | 纯渲染（背景/星星瓶/气球/特效）+ DOM 代理 | `Renderer` `UI` |
+| game.js | 557 | 状态机校验、碰撞、计分、特效状态更新、托管定时器 | `GameState` `Game` |
+| render.js | 355 | 纯渲染（背景/星星瓶/气球/特效）+ DOM 代理 | `Renderer` `UI` |
 | balloon.js | 296 | 气球实体 + 图片缓存/预载/dispose | `Balloon` `_imageCache` |
 | hand-cursor.js | 169 | 手掌光标 + 连击光环拖尾 | `HandCursor` |
 | camera.js | 116 | 摄像头 + MoveNet + Hands（含 stop()） | `Camera` |
