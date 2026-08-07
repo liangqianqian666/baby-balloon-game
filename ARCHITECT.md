@@ -48,4 +48,5 @@ baby-balloon-game/
 ## 数据流
 - 设置：`CONFIG` ← localStorage 覆盖（backgroundMode / imageStyle / starsToWin / currentProfile）
 - 学习数据：`SpacedRep._data` ⇄ `balloon-learning-data-<角色>`；埋点 ⇄ `balloon-analytics-<角色>`
+- staging 隔离：路径含 `-dev` 时 Storage 读写自动加 `stag:` 前缀（config.js 顶部，与正式站同域）
 - 渲染：Canvas 2D 单层（视频镜像背景 → 星星瓶 → 气球 → 特效 → 手光标）；DOM 仅提示/计分，由 UI 垫片读写
