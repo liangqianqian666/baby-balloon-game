@@ -14,6 +14,7 @@
 - **dev** = 日常累积，允许随时坏；本地自测 `python3 -m http.server`（localhost 可用摄像头）
 - **feat/xxx** = 单功能/修复，自测通过后合入 dev
 - 发布：GitHub 开 PR（dev → main）→ Merge → 本地 `git checkout main && git pull && git tag vX.Y.Z && git push --tags`（main 有 Ruleset 禁直推）
+- 版本号（简化 semver）：Z+1 = bug 修复/微调（默认）；Y+1 = 新功能/新专题/新关卡；X 保持 0，用户规模起来再谈 1.0
 - 发布前冒烟：鼠标进一关 → 答对/答错 → 通关 → 摄像头模式 → 刷新后学习数据仍在
 - 回滚：Actions 找到上个 tag 的 deploy run → Re-run，或 revert 合入提交
 
