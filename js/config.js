@@ -1,5 +1,14 @@
 // config.js — 全局配置常量（所有可调参数的唯一来源）
 
+// staging 与正式站同域（liangqianqian666.github.io）共享 localStorage，测试会污染孩子的学习记录；
+// 命中 staging 路径时给读写统一加前缀隔离（config.js 最先加载，调用点零改动）
+if (location.pathname.includes('baby-balloon-game-dev')) {
+  for (const m of ['getItem', 'setItem', 'removeItem']) {
+    const orig = Storage.prototype[m];
+    Storage.prototype[m] = function (k) { return orig.call(this, 'stag:' + k); };
+  }
+}
+
 const CONFIG = {
   // === 核心玩法 ===
   starsToWin: 10,
