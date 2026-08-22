@@ -81,78 +81,52 @@ body {
 }
 
 #level-buttons {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+  gap: 10px;
   max-width: 700px;
   padding: 0 10px;
   width: 100%;
-}
-
-.level-row {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 4px 10px;
-  background: rgba(255,255,255,0.5);
-  border-radius: 12px;
-}
-
-.level-topic {
-  font-size: 14px;
-  font-weight: bold;
-  color: #555;
-  min-width: 120px;
-  text-align: left;
-}
-
-.level-btn-locked {
-  opacity: 0.35;
-  cursor: not-allowed !important;
-  position: relative;
-}
-
-.level-locked-tag {
-  font-size: 9px;
-  color: #999;
-  font-style: italic;
 }
 
 .level-btn {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 2px;
-  width: 72px;
-  height: 56px;
+  justify-content: center;
+  gap: 6px;
+  height: 96px;
   border: none;
-  border-radius: 12px;
+  border-radius: 14px;
   background: white;
   box-shadow: 0 2px 0 #ddd, 0 3px 8px rgba(0,0,0,0.08);
   cursor: pointer;
   transition: transform 0.1s;
-  justify-content: center;
-  padding: 4px;
+  position: relative;
 }
 
 .level-btn:active {
-  transform: translateY(3px);
+  transform: translateY(2px);
   box-shadow: 0 3px 0 #ddd;
 }
 
 .level-icon {
-  font-size: 22px;
+  font-size: 32px;
+  line-height: 1;
 }
 
 .level-name {
-  font-size: 10px;
+  font-size: 13px;
   font-weight: bold;
   color: #555;
+  text-align: center;
+  padding: 0 4px;
+  line-height: 1.2;
 }
 
 .level-complete {
   position: absolute;
-  top: 4px;
+  top: 6px;
   right: 6px;
   font-size: 14px;
   color: #44CC44;
@@ -161,8 +135,8 @@ body {
 
 .level-due {
   position: absolute;
-  top: 4px;
-  right: 4px;
+  top: 6px;
+  right: 6px;
   font-size: 9px;
   background: #FF6B6B;
   color: white;
@@ -173,10 +147,6 @@ body {
   justify-content: center;
   font-weight: bold;
   white-space: nowrap;
-}
-
-.level-btn {
-  position: relative;
 }
 
 /* 游戏画布 */
