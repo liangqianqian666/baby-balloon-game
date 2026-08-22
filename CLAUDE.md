@@ -29,4 +29,5 @@
 |---|---|---|
 | `ARCHITECT.md` | 架构字典（分工/架构模式/逻辑流/数据流） | 80 |
 | `REFACTORING_TODO.md` | 缺陷诊断 + 分阶段重构清单 | 80 |
-| `.claude/CLAUDE.md` | 项目背景 / 部署 / 开发规范 | — |
+| `.claude/CLAUDE.md` | 项目背景 / 部署 / 开发规范（唯一事实源） | — |
+| `AGENTS.md` | 符号链接 → `.claude/CLAUDE.md`，供 Qoder/Cursor 等工具读取 | — |
