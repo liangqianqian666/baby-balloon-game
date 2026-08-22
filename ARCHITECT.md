@@ -35,7 +35,7 @@ baby-balloon-game/
 | camera.js | 116 | 摄像头 + MoveNet + Hands（含 stop()） | `Camera` |
 | audio.js | 246 | TTS / 预录音 / 合成音效 + stopSpeech | `AudioManager` |
 | analytics.js | 113 | 本地埋点（幂等 init + flush） | `Analytics` |
-| main.js | 501 | 初始化、rAF 循环启停、关卡 UI、角色/设置 | `game` `renderer` 等 |
+| main.js | 473 | 初始化、rAF 循环启停、关卡 UI、角色/设置 | `game` `renderer` 等 |
 
 ## 核心逻辑流
 1. 加载：`DOMContentLoaded` → UI.init/恢复设置 → `showLevelSelect()`

@@ -114,35 +114,7 @@ function showLevelSelect() {
 
   LEVEL_CATEGORIES.forEach(cat => {
     if (!LEVELS[cat.basic]) return;
-
-    const row = document.createElement('div');
-    row.className = 'level-row';
-
-    // 主题标签
-    const topic = document.createElement('span');
-    topic.className = 'level-topic';
-    topic.innerHTML = `${cat.icon} ${cat.topic}`;
-    row.appendChild(topic);
-
-    // 基础玩法按钮
-    const level = LEVELS[cat.basic];
-    const basicBtn = makeBtn(cat.basic, '📚', 'Basic');
-    row.appendChild(basicBtn);
-
-    // 进阶玩法按钮
-    if (cat.advanced && LEVELS[cat.advanced]) {
-      const advBtn = makeBtn(cat.advanced, cat.advancedIcon, cat.advancedName);
-      row.appendChild(advBtn);
-    } else {
-      // 灰色占位
-      const placeholder = document.createElement('button');
-      placeholder.className = 'level-btn level-btn-locked';
-      placeholder.disabled = true;
-      placeholder.innerHTML = `<span class="level-icon">${cat.advancedIcon || '🔒'}</span><span class="level-name">${cat.advancedName || 'Coming'}</span><span class="level-locked-tag">Soon</span>`;
-      row.appendChild(placeholder);
-    }
-
-    container.appendChild(row);
+    container.appendChild(makeBtn(cat.basic, cat.icon, cat.topic));
   });
 }
 
