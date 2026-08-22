@@ -32,7 +32,7 @@ baby-balloon-game/
 | render.js | 355 | 纯渲染（背景/星星瓶/气球/特效）+ DOM 代理 | `Renderer` `UI` |
 | balloon.js | 296 | 气球实体 + 图片缓存/预载/dispose | `Balloon` `_imageCache` |
 | hand-cursor.js | 169 | 手掌光标 + 连击光环拖尾 | `HandCursor` |
-| camera.js | 116 | 摄像头 + MoveNet + Hands（含 stop()） | `Camera` |
+| camera.js | 91 | 摄像头 + MediaPipe Hands 手部追踪（含 stop()） | `Camera` |
 | audio.js | 246 | TTS / 预录音 / 合成音效 + stopSpeech | `AudioManager` |
 | analytics.js | 113 | 本地埋点（幂等 init + flush） | `Analytics` |
 | main.js | 473 | 初始化、rAF 循环启停、关卡 UI、角色/设置 | `game` `renderer` 等 |

@@ -20,8 +20,8 @@
 
 ## 技术栈
 - 纯静态 HTML/JS/Canvas，无构建工具
-- TensorFlow.js MoveNet — 手势追踪
-- MediaPipe Selfie Segmentation — 背景抠图
+- MediaPipe Hands — 手部追踪
+- 摄像头视频镜像 — 游戏背景
 - localStorage — 所有学习数据存在用户本地
 
 ## 文件结构
@@ -36,7 +36,7 @@ js/
   spaced-rep.js     — 艾宾浩斯间隔重复模块
   balloon.js        — 气球渲染（颜色/图片/文字三种模式）
   hand-cursor.js    — 手部光标
-  camera.js         — 摄像头 + MoveNet + 背景分割
+  camera.js         — 摄像头 + MediaPipe Hands 手部追踪
   game.js           — 游戏核心逻辑
   audio.js          — 音效（Web Audio API 合成）
   analytics.js      — 本地埋点
