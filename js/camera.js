@@ -1,12 +1,8 @@
-// camera.js — 摄像头 + MoveNet(身体追踪) + MediaPipe Hands(手部追踪)
+// camera.js — 摄像头 + MediaPipe Hands(手部追踪)
 
 const Camera = {
   video: null,
   ready: false,
-
-  // MoveNet (身体姿态)
-  detector: null,
-  poseReady: false,
 
   // MediaPipe Hands (手部)
   hands: null,
@@ -30,15 +26,6 @@ const Camera = {
         resolve();
       };
     });
-
-    // 加载 MoveNet Lightning（身体姿态追踪）
-    console.log('Loading MoveNet...');
-    const model = poseDetection.SupportedModels.MoveNet;
-    this.detector = await poseDetection.createDetector(model, {
-      modelType: poseDetection.movenet.modelType.SINGLEPOSE_LIGHTNING,
-    });
-    console.log('MoveNet ready!');
-    this.poseReady = true;
 
     // 加载 MediaPipe Hands（手部追踪）
     console.log('Loading MediaPipe Hands...');
@@ -73,18 +60,6 @@ const Camera = {
       } catch (e) { /* 静默 */ }
     }
     requestAnimationFrame(() => this._handsLoop());
-  },
-
-  // 检测身体姿态（MoveNet），返回 17 个 keypoints
-  async detectPose() {
-    if (!this.poseReady || !this.detector) return null;
-    try {
-      const poses = await this.detector.estimatePoses(this.video);
-      if (poses.length > 0) return poses[0].keypoints;
-    } catch (e) {
-      // 静默忽略
-    }
-    return null;
   },
 
   // 检测手部（MediaPipe Hands），返回 hands landmarks 数组
