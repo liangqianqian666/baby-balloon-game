@@ -2,6 +2,10 @@
 
 Pop the Balloon! — 幼儿英语体感游戏（摄像头举手戳气球学单词）
 
+## 在线试玩
+
+👉 https://liangqianqian666.github.io/baby-balloon-game/
+
 ## 运行
 
 ```bash
